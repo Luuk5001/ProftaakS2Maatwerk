@@ -3,6 +3,7 @@ package com.s21m.proftaaks2maatwerk.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -22,7 +23,13 @@ import com.s21m.proftaaks2maatwerk.data.Emotions;
 import com.s21m.proftaaks2maatwerk.data.ResultData;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -64,10 +71,9 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.buttonOpenGallery)
     public void OpenGallery(View view) {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Choose Picture"), REQUEST_GALLERY);
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        photoPickerIntent.setType("image/*");
+        startActivityForResult(photoPickerIntent, REQUEST_GALLERY);
     }
 
     @Override
@@ -77,8 +83,8 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_CAMERA:
                 if(resultCode == RESULT_OK) {
-                    Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-                    sendImage(bitmap);
+                    Bitmap image = (Bitmap) data.getExtras().get("data");
+                    sendImage(imageToByteArray(image));
                 }
                 break;
 
@@ -86,8 +92,8 @@ public class MainActivity extends AppCompatActivity {
                 if (resultCode == RESULT_OK) {
                     Uri selectedImg = data.getData();
                     try {
-                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImg);
-                        sendImage(bitmap);
+                        Bitmap image = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImg);
+                        sendImage(imageToByteArray(image));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -96,11 +102,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void sendImage(final Bitmap image){
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream .toByteArray();
-        String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
+    private void sendImage(final byte[] imageByteArray){
+        String imageBase64 = Base64.encodeToString(imageByteArray, Base64.DEFAULT);
 
         String apiKey = "";
         String apiLink = "http://test.nl";
@@ -127,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
 
                     Log.d(TAG, "API responded with " + response);
 
-                    mResult = new ResultData(image, 10, Emotions.Happiness);
+                    mResult = new ResultData(writeImageToInternalStorage(imageByteArray), 10, Emotions.Happiness);
 
                     Intent intent = new Intent(getBaseContext(), PictureTakenActivity.class);
                     intent.putExtra(RESULTDATA_KEY, mResult);
@@ -138,6 +141,25 @@ public class MainActivity extends AppCompatActivity {
         else{
             Toast.makeText(this, "No network connection available", Toast.LENGTH_LONG).show();
         }
+    }
+
+    private String writeImageToInternalStorage(byte[] imageByteArray) throws IOException {
+        File fileDirectory = getApplicationContext().getFilesDir();
+        File fileToWrite = new File(fileDirectory, UUID.randomUUID().toString());
+
+        FileOutputStream out = new FileOutputStream(fileToWrite);
+
+        out.write(imageByteArray);
+        out.flush();
+        out.close();
+
+        return fileToWrite.getAbsolutePath();
+    }
+
+    private byte[] imageToByteArray(Bitmap image){
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        return byteArrayOutputStream .toByteArray();
     }
 
     private boolean isNetworkAvailable() {

@@ -5,12 +5,14 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.s21m.proftaaks2maatwerk.R;
 import com.s21m.proftaaks2maatwerk.data.Emotions;
@@ -20,18 +22,29 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class PictureTakenActivity extends AppCompatActivity {
 
-    private ResultData mResult = new ResultData(null, 25, Emotions.Happiness);
+    private ResultData mResult;
+
+    @BindView(R.id.imageViewPicture)
+    ImageView mImageViewPicture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture_taken);
         ButterKnife.bind(this);
+
+        Intent intent = getIntent();
+        mResult = intent.getParcelableExtra(MainActivity.RESULTDATA_KEY);
+
+        Bitmap bitmap = BitmapFactory.decodeFile(mResult.getPicturePath());
+
+        mImageViewPicture.setImageBitmap(bitmap);
     }
 
     public static final String insertImage(ContentResolver cr,
@@ -85,12 +98,6 @@ public class PictureTakenActivity extends AppCompatActivity {
         return stringUrl;
     }
 
-    /**
-     * A copy of the Android internals StoreThumbnail method, it used with the insertImage to
-     * populate the android.provider.MediaStore.Images.Media#insertImage with all the correct
-     * meta data. The StoreThumbnail method is private so it must be duplicated here.
-     * @see android.provider.MediaStore.Images.Media (StoreThumbnail private method)
-     */
     private static final Bitmap storeThumbnail(
             ContentResolver cr,
             Bitmap source,
