@@ -5,13 +5,24 @@ import android.graphics.Bitmap;
 public class ResultData {
     private Bitmap picture;
     private int age;
-    private String emotion;
+    private Emotions emotion;
 
-    public ResultData(Bitmap picture, int age, String emotion)
+    public ResultData(Bitmap picture, int age, Emotions emotion)
     {
         this.picture = picture;
         this.age = age;
         this.emotion = emotion;
     }
 
+    public Bitmap getPicture() {
+        return picture;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public Emotions getEmotion() {
+        return emotion;
+    }
 }
