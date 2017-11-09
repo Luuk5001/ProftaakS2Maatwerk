@@ -39,7 +39,7 @@ public class FeedbackActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         Intent intent = getIntent();
-        mResultData = intent.getParcelableExtra(PictureTakenActivity.RESULTDATA_KEY);
+        mResultData = intent.getParcelableExtra(MainActivity.RESULTDATA_KEY);
 
         if(mResultData == null){
             Toast.makeText(getApplicationContext(), "An error occurred", Toast.LENGTH_LONG).show();

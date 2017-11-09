@@ -25,9 +25,6 @@ import butterknife.OnClick;
 
 public class PictureTakenActivity extends AppCompatActivity {
 
-
-    public static final String RESULTDATA_KEY = "result";
-
     private ResultData mResult = new ResultData(null, 25, Emotions.Happiness);
 
     @Override
@@ -139,7 +136,7 @@ public class PictureTakenActivity extends AppCompatActivity {
     @OnClick(R.id.buttonSendFeedback)
     public void onButtonSendFeedbackClick(View view){
         Intent intent = new Intent(this, FeedbackActivity.class);
-        intent.putExtra(RESULTDATA_KEY, mResult);
+        intent.putExtra(MainActivity.RESULTDATA_KEY, mResult);
         startActivity(intent);
     }
 }
