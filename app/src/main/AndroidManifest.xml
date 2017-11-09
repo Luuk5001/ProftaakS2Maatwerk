@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.s21m.proftaaks2maatwerk">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -11,14 +13,13 @@
         android:theme="@style/AppTheme">
 
         <activity android:name=".ui.MainActivity">
-
-        </activity>
-        <activity android:name=".ui.PictureTakenActivity" android:parentActivityName=".ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+        </activity>
+        <activity android:name=".ui.PictureTakenActivity" android:parentActivityName=".ui.MainActivity">
         </activity>
         <activity android:name=".ui.FeedbackActivity" android:parentActivityName=".ui.PictureTakenActivity">
         </activity>
