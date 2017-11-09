@@ -11,15 +11,16 @@
         android:theme="@style/AppTheme">
 
         <activity android:name=".ui.MainActivity">
+
+        </activity>
+        <activity android:name=".ui.PictureTakenActivity" android:parentActivityName=".ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".ui.PictureTakenActivity">
-        </activity>
-        <activity android:name=".ui.FeedbackActivity">
+        <activity android:name=".ui.FeedbackActivity" android:parentActivityName=".ui.PictureTakenActivity">
         </activity>
     </application>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
