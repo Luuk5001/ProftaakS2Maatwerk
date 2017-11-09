@@ -58,4 +58,9 @@ public class ResultData implements Parcelable {
             return new ResultData[size];
         }
     };
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + ":\n" + "\tAge:" + mAge + "\n\tEmotion:" + mEmotion.name();
+    }
 }

@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">ProftaakS2Maatwerk</string>
+    <string name="feedback_submit_button">SUBMIT</string>
+    <string name="feedback_emotion_label">Was your emotional state guessed correctly? If not, pick one that best describes it.</string>
+    <string name="feedback_age_label">Was your age guessed correctly? If not, specify the correct age.</string>
+    <string name="feedback_title">Feedback on your result</string>
 </resources>

@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.s21m.proftaaks2maatwerk.R;
+import com.s21m.proftaaks2maatwerk.data.Emotions;
 import com.s21m.proftaaks2maatwerk.data.ResultData;
 
 import java.io.FileNotFoundException;
@@ -25,9 +26,9 @@ import butterknife.OnClick;
 public class PictureTakenActivity extends AppCompatActivity {
 
 
-    private static final String RESULTDATA_KEY = "result";
+    public static final String RESULTDATA_KEY = "result";
 
-    private ResultData mResult;
+    private ResultData mResult = new ResultData(null, 25, Emotions.Happiness);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,6 +140,7 @@ public class PictureTakenActivity extends AppCompatActivity {
     public void onButtonSendFeedbackClick(View view){
         Intent intent = new Intent(this, FeedbackActivity.class);
         intent.putExtra(RESULTDATA_KEY, mResult);
+        startActivity(intent);
     }
 }
 
