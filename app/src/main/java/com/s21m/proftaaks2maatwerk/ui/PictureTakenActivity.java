@@ -3,25 +3,37 @@ package com.s21m.proftaaks2maatwerk.ui;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.view.View;
 
 import com.s21m.proftaaks2maatwerk.R;
+import com.s21m.proftaaks2maatwerk.data.ResultData;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 public class PictureTakenActivity extends AppCompatActivity {
+
+
+    private static final String RESULTDATA_KEY = "result";
+
+    private ResultData mResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture_taken);
+        ButterKnife.bind(this);
     }
 
     public static final String insertImage(ContentResolver cr,
@@ -121,6 +133,12 @@ public class PictureTakenActivity extends AppCompatActivity {
         } catch (IOException ex) {
             return null;
         }
+    }
+
+    @OnClick(R.id.buttonSendFeedback)
+    public void onButtonSendFeedbackClick(View view){
+        Intent intent = new Intent(this, FeedbackActivity.class);
+        intent.putExtra(RESULTDATA_KEY, mResult);
     }
 }
 
