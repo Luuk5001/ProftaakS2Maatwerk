@@ -1,30 +1,33 @@
 package com.s21m.proftaaks2maatwerk.data;
 
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.net.URI;
+
 public class ResultData implements Parcelable {
 
-    private Bitmap mPicture;
+    private String mPicturePath;
     private int mAge;
     private Emotions mEmotion;
 
-    public ResultData(Bitmap picture, int age, Emotions emotion)
+    public ResultData(String picture, int age, Emotions emotion)
     {
-        this.mPicture = picture;
+        this.mPicturePath = picture;
         this.mAge = age;
         this.mEmotion = emotion;
     }
 
     protected ResultData(Parcel in) {
-        mPicture = in.readParcelable(Bitmap.class.getClassLoader());
+        mPicturePath = in.readString();
         mAge = in.readInt();
         mEmotion = Emotions.valueOf(in.readString());
     }
 
-    public Bitmap getPicture() {
-        return mPicture;
+    public String getPicturePath() {
+        return mPicturePath;
     }
 
     public int getAge() {
@@ -42,7 +45,7 @@ public class ResultData implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeParcelable(mPicture, i);
+        parcel.writeString(mPicturePath);
         parcel.writeInt(mAge);
         parcel.writeString(this.mEmotion.name());
     }
