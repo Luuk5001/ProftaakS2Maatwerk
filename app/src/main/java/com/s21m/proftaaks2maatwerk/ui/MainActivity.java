@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
 
                     Log.d(TAG, "API responded with " + response);
 
-                    mResult = new ResultData(writeImageToInternalStorage(imageByteArray), 10, Emotions.Happiness);
+                    mResult = new ResultData(writeImageToInternalStorage(imageByteArray), 24, Emotions.Fear);
 
                     Intent intent = new Intent(getBaseContext(), PictureTakenActivity.class);
                     intent.putExtra(RESULTDATA_KEY, mResult);
