@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -26,6 +27,8 @@ public class FeedbackActivity extends AppCompatActivity {
 
     private ResultData mResultData;
     private Integer[] mAge;
+    private boolean mAgeSpinnerOpened;
+    private boolean mEmotionSpinnerOpened;
 
     @BindView(R.id.spinnerAge)
     Spinner mSpinnerAge;

@@ -19,9 +19,9 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".ui.PictureTakenActivity" android:parentActivityName=".ui.MainActivity">
+        <activity android:name=".ui.PictureTakenActivity">
         </activity>
-        <activity android:name=".ui.FeedbackActivity" android:parentActivityName=".ui.PictureTakenActivity">
+        <activity android:name=".ui.FeedbackActivity">
         </activity>
     </application>
 </manifest>

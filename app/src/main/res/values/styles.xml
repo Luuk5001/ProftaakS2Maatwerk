@@ -8,14 +8,19 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="buttonStyle">@style/buttonStyle</item>
         <item name="android:textViewStyle">@style/textViewStyle</item>
+        <item name="spinnerStyle">@style/spinnerStyle</item>
     </style>
 
     <style name="buttonStyle" parent="Base.Widget.AppCompat.Button">
         <item name="android:textColor">@android:color/white</item>
-        <item name="android:background">#0057b3</item>
+        <item name="android:background">@color/colorAccentDark</item>
     </style>
 
     <style name="textViewStyle">
         <item name="android:textColor">@android:color/white</item>
+    </style>
+    
+    <style name="spinnerStyle" parent="Base.Widget.AppCompat.Spinner">
+        <item name="android:popupBackground">@color/colorAccentDark</item>
     </style>
 </resources>
