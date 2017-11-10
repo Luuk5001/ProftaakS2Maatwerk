@@ -8,4 +8,5 @@
     android:minWidth="100dp"
     android:padding="5dp"
     android:textStyle="bold"
+    android:textColor="@android:color/white"
     tools:text="Spinner item"/>
