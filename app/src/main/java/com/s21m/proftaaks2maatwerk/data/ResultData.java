@@ -6,25 +6,25 @@ import android.os.Parcelable;
 
 public class ResultData implements Parcelable {
 
-    private Uri mImageUri;
+    private Uri mPictureUri;
     private int mAge;
     private Emotions mEmotion;
 
-    public ResultData(Uri imageUri, int age, Emotions emotion)
+    public ResultData(Uri pictureUri, int age, Emotions emotion)
     {
-        this.mImageUri = imageUri;
+        this.mPictureUri = pictureUri;
         this.mAge = age;
         this.mEmotion = emotion;
     }
 
     protected ResultData(Parcel in) {
-        mImageUri = Uri.parse(in.readString());
+        mPictureUri = Uri.parse(in.readString());
         mAge = in.readInt();
         mEmotion = Emotions.valueOf(in.readString());
     }
 
-    public Uri getPicturePath() {
-        return mImageUri;
+    public Uri getPictureUri() {
+        return mPictureUri;
     }
 
     public int getAge() {
@@ -42,7 +42,7 @@ public class ResultData implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(mImageUri.toString());
+        parcel.writeString(mPictureUri.toString());
         parcel.writeInt(mAge);
         parcel.writeString(this.mEmotion.name());
     }

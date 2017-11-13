@@ -2,6 +2,7 @@ package com.s21m.proftaaks2maatwerk.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -20,10 +21,10 @@ import com.s21m.proftaaks2maatwerk.BuildConfig;
 import com.s21m.proftaaks2maatwerk.R;
 import com.s21m.proftaaks2maatwerk.data.Emotions;
 import com.s21m.proftaaks2maatwerk.data.ResultData;
+import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -38,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String SHARED_PROVIDER_AUTHORITY = BuildConfig.APPLICATION_ID + ".fileProvider";
-    private static final String SHARED_FOLDER = "pictures";
     public static final String RESULT_KEY = "result";
     private static final int REQUEST_CAMERA = 0;
     private static final int REQUEST_GALLERY = 1;
@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         File file = createNewImageFile();
         mImageUri = FileProvider.getUriForFile(this, SHARED_PROVIDER_AUTHORITY, file);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
+        intent.putExtra("URI", mImageUri);
         startActivityForResult(intent, REQUEST_CAMERA);
     }
 
@@ -82,14 +83,33 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_CAMERA:
                 if(resultCode == RESULT_OK) {
-                    sendImage();
+                    startCropActivity();
                 }
                 break;
 
             case REQUEST_GALLERY:
                 if (resultCode == RESULT_OK) {
                     mImageUri = data.getData();
+                    startCropActivity();
+                }
+                break;
+
+            case CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE:
+                CropImage.ActivityResult result = CropImage.getActivityResult(data);
+                if (resultCode == RESULT_OK) {
+                    File fileDelete = new File(getApplicationInfo().dataDir+mImageUri.getPath());
+
+                    if(fileDelete.delete()) Log.d(TAG, "Temporary not-cropped picture deleted");
+                    else Log.d(TAG, "Temporary not-cropped picture NOT deleted");
+
+                    mImageUri = result.getUri();
+
+                    Log.d(TAG, "Cropped file Uri:\n" + mImageUri.toString());
+
                     sendImage();
+                }
+                else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                   Log.e(TAG, result.getError().toString());
                 }
                 break;
         }
@@ -134,19 +154,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void startCropActivity() {
+        CropImage.activity(mImageUri)
+                .setAspectRatio(1,1)
+                .setOutputCompressFormat(Bitmap.CompressFormat.PNG)
+                .setAllowCounterRotation(false)
+                .setAllowFlipping(false)
+                .setAllowRotation(false)
+                .start(this);
+    }
+
     private File createNewImageFile() {
         try{
-            File picturesDirectory = new File(getFilesDir(), SHARED_FOLDER);
-            if(!picturesDirectory.exists()){
-                if(!picturesDirectory.mkdirs()) {
-                    throw new IOException();
-                }
-            }
-            File pictureFile = new File(picturesDirectory, UUID.randomUUID().toString());
-            if(!pictureFile.createNewFile()) {
-                throw new IOException();
-            }
-            return pictureFile;
+            return File.createTempFile("NOT_CROPPED", null, getCacheDir());
         }
         catch (IOException e){
             e.printStackTrace();
