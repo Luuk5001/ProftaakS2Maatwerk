@@ -2,33 +2,27 @@ package com.s21m.proftaaks2maatwerk.ui;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.s21m.proftaaks2maatwerk.BuildConfig;
 import com.s21m.proftaaks2maatwerk.R;
 import com.s21m.proftaaks2maatwerk.data.Emotions;
 import com.s21m.proftaaks2maatwerk.data.ResultData;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.UUID;
 
 import butterknife.BindView;
@@ -43,11 +37,14 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String SHARED_PROVIDER_AUTHORITY = BuildConfig.APPLICATION_ID + ".fileProvider";
+    private static final String SHARED_FOLDER = "pictures";
+    public static final String RESULT_KEY = "result";
     private static final int REQUEST_CAMERA = 0;
     private static final int REQUEST_GALLERY = 1;
-    public static final String RESULTDATA_KEY = "result";
 
     private ResultData mResult;
+    private Uri mImageUri;
 
     @BindView(R.id.imageViewLastPicture)
     ImageView mImageViewLastPicture;
@@ -59,13 +56,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
         mProgressBar.setVisibility(View.INVISIBLE);
     }
 
     @OnClick(R.id.buttonTakePicture)
     public void TakePicture(View view) {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        File file = createNewImageFile();
+        mImageUri = FileProvider.getUriForFile(this, SHARED_PROVIDER_AUTHORITY, file);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
         startActivityForResult(intent, REQUEST_CAMERA);
     }
 
@@ -83,28 +82,20 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_CAMERA:
                 if(resultCode == RESULT_OK) {
-                    Bitmap image = (Bitmap) data.getExtras().get("data");
-                    sendImage(imageToByteArray(image));
+                    sendImage();
                 }
                 break;
 
             case REQUEST_GALLERY:
                 if (resultCode == RESULT_OK) {
-                    Uri selectedImg = data.getData();
-                    try {
-                        Bitmap image = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImg);
-                        sendImage(imageToByteArray(image));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    mImageUri = data.getData();
+                    sendImage();
                 }
                 break;
         }
     }
 
-    private void sendImage(final byte[] imageByteArray){
-        String imageBase64 = Base64.encodeToString(imageByteArray, Base64.DEFAULT);
-
+    private void sendImage(){
         String apiKey = "";
         String apiLink = "http://test.nl";
 
@@ -130,10 +121,10 @@ public class MainActivity extends AppCompatActivity {
 
                     Log.d(TAG, "API responded with " + response);
 
-                    mResult = new ResultData(writeImageToInternalStorage(imageByteArray), 24, Emotions.Fear);
+                    mResult = new ResultData(mImageUri, 24, Emotions.Fear);
 
                     Intent intent = new Intent(getBaseContext(), PictureTakenActivity.class);
-                    intent.putExtra(RESULTDATA_KEY, mResult);
+                    intent.putExtra(RESULT_KEY, mResult);
                     startActivity(intent);
                 }
             });
@@ -143,23 +134,24 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private String writeImageToInternalStorage(byte[] imageByteArray) throws IOException {
-        File fileDirectory = getApplicationContext().getFilesDir();
-        File fileToWrite = new File(fileDirectory, UUID.randomUUID().toString());
-
-        FileOutputStream out = new FileOutputStream(fileToWrite);
-
-        out.write(imageByteArray);
-        out.flush();
-        out.close();
-
-        return fileToWrite.getAbsolutePath();
-    }
-
-    private byte[] imageToByteArray(Bitmap image){
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-        return byteArrayOutputStream .toByteArray();
+    private File createNewImageFile() {
+        try{
+            File picturesDirectory = new File(getFilesDir(), SHARED_FOLDER);
+            if(!picturesDirectory.exists()){
+                if(!picturesDirectory.mkdirs()) {
+                    throw new IOException();
+                }
+            }
+            File pictureFile = new File(picturesDirectory, UUID.randomUUID().toString());
+            if(!pictureFile.createNewFile()) {
+                throw new IOException();
+            }
+            return pictureFile;
+        }
+        catch (IOException e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private boolean isNetworkAvailable() {

@@ -5,7 +5,6 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,7 +14,6 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.s21m.proftaaks2maatwerk.R;
-import com.s21m.proftaaks2maatwerk.data.Emotions;
 import com.s21m.proftaaks2maatwerk.data.ResultData;
 
 import java.io.FileNotFoundException;
@@ -40,11 +38,15 @@ public class PictureTakenActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         Intent intent = getIntent();
-        mResult = intent.getParcelableExtra(MainActivity.RESULTDATA_KEY);
+        mResult = intent.getParcelableExtra(MainActivity.RESULT_KEY);
 
-        Bitmap bitmap = BitmapFactory.decodeFile(mResult.getPicturePath());
-
-        mImageViewPicture.setImageBitmap(bitmap);
+        Bitmap bitmap = null;
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), mResult.getPicturePath());
+            mImageViewPicture.setImageBitmap(bitmap);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static final String insertImage(ContentResolver cr,
@@ -143,7 +145,7 @@ public class PictureTakenActivity extends AppCompatActivity {
     @OnClick(R.id.buttonSendFeedback)
     public void onButtonSendFeedbackClick(View view){
         Intent intent = new Intent(this, FeedbackActivity.class);
-        intent.putExtra(MainActivity.RESULTDATA_KEY, mResult);
+        intent.putExtra(MainActivity.RESULT_KEY, mResult);
         startActivity(intent);
     }
 }
