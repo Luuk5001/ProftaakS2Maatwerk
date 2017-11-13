@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -42,7 +41,7 @@ public class FeedbackActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         Intent intent = getIntent();
-        mResultData = intent.getParcelableExtra(MainActivity.RESULTDATA_KEY);
+        mResultData = intent.getParcelableExtra(MainActivity.RESULT_KEY);
 
         if(mResultData == null){
             Toast.makeText(getApplicationContext(), "An error occurred", Toast.LENGTH_LONG).show();
