@@ -38,7 +38,7 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final String SHARED_PROVIDER_AUTHORITY = BuildConfig.APPLICATION_ID + ".fileProvider";
+    public static final String SHARED_PROVIDER_AUTHORITY = BuildConfig.APPLICATION_ID + ".fileProvider";
     public static final String RESULT_KEY = "result";
     private static final int REQUEST_CAMERA = 0;
     private static final int REQUEST_GALLERY = 1;

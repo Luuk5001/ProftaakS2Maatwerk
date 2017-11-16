@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -13,7 +13,7 @@
 
     <style name="buttonStyle" parent="Base.Widget.AppCompat.Button">
         <item name="android:textColor">@android:color/white</item>
-        <item name="android:background">@color/colorAccentDark</item>
+        <item name="android:background">@drawable/rounded_shape</item>
     </style>
 
     <style name="textViewStyle">
