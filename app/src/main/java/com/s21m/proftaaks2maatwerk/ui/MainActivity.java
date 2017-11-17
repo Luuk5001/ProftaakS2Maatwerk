@@ -7,9 +7,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -40,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     public static final String SHARED_PROVIDER_AUTHORITY = BuildConfig.APPLICATION_ID + ".fileProvider";
     public static final String RESULT_KEY = "result";
+    public static final String CAMERA_RESULT_KEY = "FILE_URI";
     private static final int REQUEST_CAMERA = 0;
     private static final int REQUEST_GALLERY = 1;
 
@@ -61,11 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.buttonTakePicture)
     public void TakePicture(View view) {
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File file = createNewImageFile();
-        mImageUri = FileProvider.getUriForFile(this, SHARED_PROVIDER_AUTHORITY, file);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
-        intent.putExtra("URI", mImageUri);
+        Intent intent = new Intent(this, CameraActivity.class);
         startActivityForResult(intent, REQUEST_CAMERA);
     }
 
@@ -83,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_CAMERA:
                 if(resultCode == RESULT_OK) {
+                    mImageUri = Uri.parse(data.getStringExtra(CAMERA_RESULT_KEY));
                     startCropActivity();
                 }
                 break;
