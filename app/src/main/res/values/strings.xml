@@ -5,4 +5,9 @@
     <string name="feedback_age_label">Was your age guessed correctly? If not, specify the correct age.</string>
     <string name="feedback_title">Feedback on your result</string>
     <string name="share_button_title">Share</string>
+    <string name="back_to_camera_button">Go to camera</string>
+    <string name="crop_and_submit_button">CROP AND SUBMIT</string>
+    <string name="toggle_flash_button_description">Toggle Flash</string>
+    <string name="switch_lens_button_description">Switch lens</string>
+    <string name="take_picture_button">TAKE PICTURE</string>
 </resources>

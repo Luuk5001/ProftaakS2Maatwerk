@@ -18,6 +18,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.s21m.proftaaks2maatwerk.Utilities.PHOTO_URI_KEY;
+import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_RETAKE;
+import static com.s21m.proftaaks2maatwerk.Utilities.SHARED_PROVIDER_AUTHORITY;
+import static com.s21m.proftaaks2maatwerk.Utilities.createNewTempFile;
+import static com.s21m.proftaaks2maatwerk.Utilities.saveBitmapToFile;
+
 public class CropActivity extends AppCompatActivity {
 
     @BindView(R.id.cropImageView)
@@ -30,24 +36,24 @@ public class CropActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         Intent intent = getIntent();
-        Uri photoUri = Uri.parse(intent.getStringExtra(MainActivity.PHOTO_URI_KEY));
+        Uri photoUri = Uri.parse(intent.getStringExtra(PHOTO_URI_KEY));
         mCropImageView.setImageUriAsync(photoUri);
     }
 
     @OnClick(R.id.buttonCropImage)
     public void onClickButtonCropImage(){
-        final File photoFile = Utilities.createNewTempFile(CropActivity.this, "CROPPED", null);
-        final Uri fileUri = FileProvider.getUriForFile(getApplicationContext(), MainActivity.SHARED_PROVIDER_AUTHORITY, photoFile);
+        final File photoFile = createNewTempFile(CropActivity.this, "CROPPED", null);
+        final Uri fileUri = FileProvider.getUriForFile(getApplicationContext(), SHARED_PROVIDER_AUTHORITY, photoFile);
         mCropImageView.setOnCropImageCompleteListener(new CropImageView.OnCropImageCompleteListener() {
             @Override
             public void onCropImageComplete(CropImageView view, CropImageView.CropResult result) {
                 try {
-                    Utilities.saveBitmapToFile(photoFile, result.getBitmap());
+                    saveBitmapToFile(photoFile, result.getBitmap());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 Intent data = new Intent();
-                data.putExtra(MainActivity.PHOTO_URI_KEY, String.valueOf(fileUri));
+                data.putExtra(PHOTO_URI_KEY, String.valueOf(fileUri));
                 setResult(RESULT_OK, data);
                 finish();
             }
@@ -57,5 +63,7 @@ public class CropActivity extends AppCompatActivity {
 
     @OnClick(R.id.buttonRetakePhoto)
     public void onClickButtonRetakePhoto(View view){
+        setResult(RESULT_RETAKE);
+        finish();
     }
 }

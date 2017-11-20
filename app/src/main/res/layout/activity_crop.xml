@@ -15,9 +15,11 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-    </com.theartofdev.edmodo.cropper.CropImageView>
+        app:layout_constraintTop_toTopOf="parent"
+        app:cropShowProgressBar="false"
+        app:cropBorderCornerColor="@color/colorAccent"
+        app:cropBorderCornerThickness="4dp"
+        app:cropBorderCornerLength="25dp"/>
 
     <Button
         style="@style/buttonTranslucentStyle"
@@ -28,19 +30,21 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="CROP AND SUBMIT"
+        android:text="@string/crop_and_submit_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/buttonRetakePhoto"
         app:layout_constraintTop_toTopOf="@+id/guideline"/>
 
     <ImageButton
+        android:contentDescription="@string/back_to_camera_button"
         style="@style/imageButtonStyle"
         android:id="@+id/buttonRetakePhoto"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded_shape_translucent"
         app:layout_constraintBottom_toBottomOf="parent"

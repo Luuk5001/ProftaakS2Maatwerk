@@ -16,8 +16,14 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-    </io.fotoapparat.view.CameraView>
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <io.fotoapparat.facedetector.view.RectanglesView
+        android:id="@+id/rectanglesView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:rectanglesColor="@color/colorAccent"
+        app:rectanglesStrokeWidth="5dp"/>
 
     <Button
         style="@style/buttonTranslucentStyle"
@@ -28,19 +34,21 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="TAKE PICTURE"
+        android:text="@string/take_picture_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/imageButtonToggleFlash"
         app:layout_constraintStart_toEndOf="@+id/imageButtonSwitchCamera"
         app:layout_constraintTop_toTopOf="@+id/guideline3"/>
 
     <ImageButton
+        android:contentDescription="@string/switch_lens_button_description"
         android:id="@+id/imageButtonSwitchCamera"
         style="@style/imageButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded_shape_translucent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -49,18 +57,20 @@
         app:srcCompat="@drawable/ic_switch_camera_white_36dp"/>
 
     <ImageButton
+        android:contentDescription="@string/toggle_flash_button_description"
         android:id="@+id/imageButtonToggleFlash"
         style="@style/imageButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded_shape_translucent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/cameraView"
         app:layout_constraintTop_toTopOf="@+id/guideline3"
-        app:srcCompat="@drawable/ic_flash_off_white_36dp"/>
+        app:srcCompat="@drawable/ic_flash_auto_white_36dp" />
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline3"

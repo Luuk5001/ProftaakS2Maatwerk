@@ -1,9 +1,14 @@
 package com.s21m.proftaaks2maatwerk.ui;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -28,18 +33,18 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import static com.s21m.proftaaks2maatwerk.Utilities.CONTEXT_KEY;
+import static com.s21m.proftaaks2maatwerk.Utilities.PHOTO_URI_KEY;
+import static com.s21m.proftaaks2maatwerk.Utilities.REQUEST_CAMERA;
+import static com.s21m.proftaaks2maatwerk.Utilities.REQUEST_CAMERA_PERMISSION;
+import static com.s21m.proftaaks2maatwerk.Utilities.REQUEST_CROP;
+import static com.s21m.proftaaks2maatwerk.Utilities.REQUEST_GALLERY;
+import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_DATA_KEY;
+import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_RETAKE;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    public static final String SHARED_PROVIDER_AUTHORITY = BuildConfig.APPLICATION_ID + ".fileProvider";
-    public static final String RESULT_KEY = "RESULT";
-    public static final String PHOTO_URI_KEY = "PHOTO_URI";
-    public static final String LENS_POSITION_KEY = "LENS_POSITION";
-    public static final int FRONT_LENS = 0;
-    public static final int BACK_LENS = 1;
-    public static final int REQUEST_CAMERA = 0;
-    public static final int REQUEST_GALLERY = 1;
-    public static final int REQUEST_CROP = 2;
 
     private ResultData mResult;
 
@@ -58,7 +63,14 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.buttonTakePicture)
     public void onClickTakePicture(View view) {
-        takePhoto(FRONT_LENS);
+        if(ContextCompat.checkSelfPermission(this,Manifest.permission.WRITE_CALENDAR)
+                == PackageManager.PERMISSION_GRANTED){
+            takePhoto();
+        }
+        else{
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+        }
     }
 
     @OnClick(R.id.buttonOpenGallery)
@@ -92,6 +104,21 @@ public class MainActivity extends AppCompatActivity {
                     Uri imageUri = Uri.parse(data.getStringExtra(PHOTO_URI_KEY));
                     sendPhoto(imageUri);
                 }
+                else if(resultCode == RESULT_RETAKE){
+                    takePhoto();
+                }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case REQUEST_CAMERA_PERMISSION:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    takePhoto();
+                }
         }
     }
 
@@ -101,15 +128,22 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, REQUEST_CROP);
     }
 
-    private void takePhoto(int lensPosition){
+    private void takePhoto(){
         Intent intent = new Intent(this, CameraActivity.class);
-        intent.putExtra(LENS_POSITION_KEY, lensPosition);
         startActivityForResult(intent, REQUEST_CAMERA);
     }
 
     private void sendPhoto(final Uri imageUri){
         String apiKey = "";
         String apiLink = "http://test.nl";
+
+        mResult = new ResultData(imageUri, 24, Emotions.Fear);
+
+        Intent intent = new Intent(getBaseContext(), PictureTakenActivity.class);
+        intent.putExtra(RESULT_DATA_KEY, mResult);
+        startActivity(intent);
+
+        /*
 
         if(Utilities.isNetworkAvailable(this)){
             Utilities.toggleProgressBar(mProgressBar);
@@ -144,5 +178,6 @@ public class MainActivity extends AppCompatActivity {
         else{
             Toast.makeText(this, "No network connection available", Toast.LENGTH_LONG).show();
         }
+        */
     }
 }

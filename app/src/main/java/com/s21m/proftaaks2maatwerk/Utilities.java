@@ -1,6 +1,7 @@
 package com.s21m.proftaaks2maatwerk;
 
 
+import android.app.Application;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
@@ -13,6 +14,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public final class Utilities {
+
+    public static final String SHARED_PROVIDER_AUTHORITY = BuildConfig.APPLICATION_ID + ".fileProvider";
+    public static final String RESULT_DATA_KEY = "RESULT";
+    public static final String PHOTO_URI_KEY = "PHOTO_URI";
+    public static final String CONTEXT_KEY = "CONTEXT";
+    public static final byte REQUEST_CAMERA = 0;
+    public static final byte REQUEST_GALLERY = 1;
+    public static final byte REQUEST_CROP = 2;
+    public static final byte REQUEST_CAMERA_PERMISSION = 3;
+    public static final byte RESULT_RETAKE = 0;
+
     public static void toggleProgressBar(ProgressBar bar) {
         if(bar.getVisibility() == View.INVISIBLE){
             bar.setVisibility(View.VISIBLE);

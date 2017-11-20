@@ -21,6 +21,8 @@ android {
 
 repositories {
     maven { url 'https://jitpack.io' }
+    maven { url  "http://dl.bintray.com/fotoapparat/fotoapparat" }
+    google()
 }
 
 dependencies {
@@ -36,6 +38,7 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     compile 'org.parceler:parceler-api:1.1.9'
     annotationProcessor 'org.parceler:parceler:1.1.9'
-    compile 'com.theartofdev.edmodo:android-image-cropper:2.5.+'
+    compile 'com.theartofdev.edmodo:android-image-cropper:2.5.1'
     compile 'io.fotoapparat.fotoapparat:library:1.4.1'
+    compile 'io.fotoapparat:facedetector:1.0.0'
 }

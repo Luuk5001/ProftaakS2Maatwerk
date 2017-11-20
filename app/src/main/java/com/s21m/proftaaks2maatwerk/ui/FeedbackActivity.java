@@ -20,6 +20,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_DATA_KEY;
+
 public class FeedbackActivity extends AppCompatActivity {
 
     private static final String TAG = FeedbackActivity.class.getSimpleName();
@@ -41,7 +43,7 @@ public class FeedbackActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         Intent intent = getIntent();
-        mResultData = intent.getParcelableExtra(MainActivity.RESULT_KEY);
+        mResultData = intent.getParcelableExtra(RESULT_DATA_KEY);
 
         if(mResultData == null){
             Toast.makeText(getApplicationContext(), "An error occurred", Toast.LENGTH_LONG).show();

@@ -31,6 +31,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_DATA_KEY;
+
 public class PictureTakenActivity extends AppCompatActivity {
 
     private ResultData mResult;
@@ -48,7 +50,7 @@ public class PictureTakenActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         Intent intent = getIntent();
-        mResult = intent.getParcelableExtra(MainActivity.RESULT_KEY);
+        mResult = intent.getParcelableExtra(RESULT_DATA_KEY);
 
         bitmap = null;
         try {
@@ -107,7 +109,7 @@ public class PictureTakenActivity extends AppCompatActivity {
     @OnClick(R.id.buttonSendFeedback)
     public void onButtonSendFeedbackClick(View view){
         Intent intent = new Intent(this, FeedbackActivity.class);
-        intent.putExtra(MainActivity.RESULT_KEY, mResult);
+        intent.putExtra(RESULT_DATA_KEY, mResult);
         startActivity(intent);
     }
 
