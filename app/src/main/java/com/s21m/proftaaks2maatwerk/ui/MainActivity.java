@@ -32,11 +32,14 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     public static final String SHARED_PROVIDER_AUTHORITY = BuildConfig.APPLICATION_ID + ".fileProvider";
-    public static final String RESULT_KEY = "result";
+    public static final String RESULT_KEY = "RESULT";
     public static final String PHOTO_URI_KEY = "PHOTO_URI";
-    private static final int REQUEST_CAMERA = 0;
-    private static final int REQUEST_GALLERY = 1;
-    private static final int REQUEST_CROP = 2;
+    public static final String LENS_POSITION_KEY = "LENS_POSITION";
+    public static final int FRONT_LENS = 0;
+    public static final int BACK_LENS = 1;
+    public static final int REQUEST_CAMERA = 0;
+    public static final int REQUEST_GALLERY = 1;
+    public static final int REQUEST_CROP = 2;
 
     private ResultData mResult;
 
@@ -55,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.buttonTakePicture)
     public void onClickTakePicture(View view) {
-        takePhoto();
+        takePhoto(FRONT_LENS);
     }
 
     @OnClick(R.id.buttonOpenGallery)
@@ -98,8 +101,9 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, REQUEST_CROP);
     }
 
-    private void takePhoto(){
+    private void takePhoto(int lensPosition){
         Intent intent = new Intent(this, CameraActivity.class);
+        intent.putExtra(LENS_POSITION_KEY, lensPosition);
         startActivityForResult(intent, REQUEST_CAMERA);
     }
 

@@ -35,6 +35,7 @@
     <style name="buttonTranslucentStyle" parent="Base.Widget.AppCompat.Button">
         <item name="android:textColor">@android:color/white</item>
         <item name="android:background">@drawable/rounded_shape_translucent</item>
+        <item name="android:stateListAnimator">@null</item>
     </style>
 
     <style name="textViewStyle">
