@@ -27,6 +27,7 @@ import io.fotoapparat.result.PhotoResult;
 import io.fotoapparat.view.CameraView;
 
 import static com.s21m.proftaaks2maatwerk.Utilities.PHOTO_URI_KEY;
+import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_CAMERA_UNAVAILABLE;
 import static com.s21m.proftaaks2maatwerk.Utilities.SHARED_PROVIDER_AUTHORITY;
 import static com.s21m.proftaaks2maatwerk.Utilities.createNewTempFile;
 import static io.fotoapparat.parameter.selector.FlashSelectors.autoFlash;
@@ -69,7 +70,7 @@ public class CameraActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         if(!checkLensAvailability()){
-            //TODO notify user of unavailable camera
+            setResult(RESULT_CAMERA_UNAVAILABLE);
             finish();
         }
 

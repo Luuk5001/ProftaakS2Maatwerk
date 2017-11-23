@@ -13,8 +13,10 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.s21m.proftaaks2maatwerk.R;
 import com.s21m.proftaaks2maatwerk.data.Emotions;
@@ -33,6 +35,7 @@ import static com.s21m.proftaaks2maatwerk.Utilities.REQUEST_CAMERA_PERMISSION;
 import static com.s21m.proftaaks2maatwerk.Utilities.REQUEST_CROP;
 import static com.s21m.proftaaks2maatwerk.Utilities.REQUEST_GALLERY;
 import static com.s21m.proftaaks2maatwerk.Utilities.REQUEST_STORAGE_PERMISSION;
+import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_CAMERA_UNAVAILABLE;
 import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_DATA_KEY;
 import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_RETAKE;
 
@@ -46,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
     ImageView mImageViewLastPicture;
     @BindView(R.id.progressBar)
     ProgressBar mProgressBar;
+    @BindView(R.id.buttonTakePicture)
+    Button mTakePictureButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +115,9 @@ public class MainActivity extends AppCompatActivity {
                 if(resultCode == RESULT_OK){
                     Uri imageUri = Uri.parse(data.getStringExtra(PHOTO_URI_KEY));
                     cropPhoto(imageUri);
+                }
+                else if(resultCode == RESULT_CAMERA_UNAVAILABLE){
+                    Toast.makeText(this, "The photo camera on this device is either unavailable or unsupported.", Toast.LENGTH_LONG).show();
                 }
                 break;
 
@@ -214,5 +222,11 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "No network connection available", Toast.LENGTH_LONG).show();
         }
         */
+    }
+
+    private void configureTakePictureButton(){
+        if (!this.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+            mTakePictureButton.setVisibility(View.GONE);
+        }
     }
 }
