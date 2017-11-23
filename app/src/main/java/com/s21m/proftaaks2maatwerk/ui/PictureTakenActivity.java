@@ -42,6 +42,8 @@ public class PictureTakenActivity extends AppCompatActivity {
 
     @BindView(R.id.imageViewPicture)
     ImageView mImageViewPicture;
+    @BindView(R.id.buttonSavePicture)
+    Button mButtonSavePicture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +78,6 @@ public class PictureTakenActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.O)
     @OnClick(R.id.buttonSavePicture)
     public void onClickButtonSavePicture(View view){
-        Button buttonSavePicture = (Button) findViewById(R.id.buttonSavePicture);
         // File imagePath = new File(Environment.getExternalStorageDirectory(), SHARED);
         // File newFile = new File(imagePath, "default_image.jpg");
         // Uri contentUri = FileProvider.getUriForFile(this, MainActivity.SHARED_PROVIDER_AUTHORITY, newFile);
@@ -98,8 +99,8 @@ public class PictureTakenActivity extends AppCompatActivity {
             out.flush();
             out.close();
             Toast.makeText(PictureTakenActivity.this, "Photo has been saved in images", Toast.LENGTH_LONG).show();
-            buttonSavePicture.setEnabled(false);
-            buttonSavePicture.setBackgroundResource(R.drawable.rounded_shape_disabled);
+            mButtonSavePicture.setEnabled(false);
+            mButtonSavePicture.setBackgroundResource(R.drawable.rounded_shape_disabled);
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(PictureTakenActivity.this, "Something went wrong: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -113,14 +114,14 @@ public class PictureTakenActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
             case 1: {
 
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.

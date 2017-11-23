@@ -12,18 +12,13 @@ import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.s21m.proftaaks2maatwerk.R;
-import com.s21m.proftaaks2maatwerk.Utilities;
 
 import java.io.File;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.fotoapparat.Fotoapparat;
-import io.fotoapparat.facedetector.Rectangle;
-import io.fotoapparat.facedetector.processor.FaceDetectorProcessor;
-import io.fotoapparat.facedetector.view.RectanglesView;
 import io.fotoapparat.parameter.update.UpdateRequest;
 import io.fotoapparat.result.PendingResult;
 import io.fotoapparat.result.PhotoResult;
@@ -38,7 +33,7 @@ import static io.fotoapparat.parameter.selector.FlashSelectors.on;
 import static io.fotoapparat.parameter.selector.LensPositionSelectors.back;
 import static io.fotoapparat.parameter.selector.LensPositionSelectors.front;
 
-public class CameraActivity extends AppCompatActivity implements FaceDetectorProcessor.OnFacesDetectedListener{
+public class CameraActivity extends AppCompatActivity{
 
     private static final byte FLASH_ON = 0;
     private static final byte FLASH_OFF = 1;
@@ -49,14 +44,11 @@ public class CameraActivity extends AppCompatActivity implements FaceDetectorPro
     private Fotoapparat mFotoapparat;
     private int mCurrentLensPosition = FRONT_LENS;
     private byte mCurrentFlashMode = FLASH_AUTO;
-    private FaceDetectorProcessor mFaceDetectorProcessor;
 
     @BindView(R.id.cameraView)
     CameraView mCameraView;
     @BindView(R.id.imageButtonToggleFlash)
     ImageButton mImageButtonToggleFlash;
-    @BindView(R.id.rectanglesView)
-    RectanglesView mRectanglesView;
     @BindView(R.id.buttonTakePicture)
     Button mButtonTakePicture;
 
@@ -69,7 +61,6 @@ public class CameraActivity extends AppCompatActivity implements FaceDetectorPro
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        setFaceDetectorProcessor();
         setActiveLens();
     }
 
@@ -116,11 +107,6 @@ public class CameraActivity extends AppCompatActivity implements FaceDetectorPro
         toggleFlashMode();
     }
 
-    @Override
-    public void onFacesDetected(List<Rectangle> faces) {
-        mRectanglesView.setRectangles(faces);
-    }
-
     //Change the camera lens in the mFotoapparat variable
     private void setActiveLens(){
         if(mCurrentLensPosition == FRONT_LENS){
@@ -128,7 +114,6 @@ public class CameraActivity extends AppCompatActivity implements FaceDetectorPro
                     .with(this)
                     .into(mCameraView)
                     .lensPosition(front())
-                    .frameProcessor(mFaceDetectorProcessor)
                     .build();
         }
         else if(mCurrentLensPosition == BACK_LENS){
@@ -136,7 +121,6 @@ public class CameraActivity extends AppCompatActivity implements FaceDetectorPro
                     .with(this)
                     .into(mCameraView)
                     .lensPosition(back())
-                    .frameProcessor(mFaceDetectorProcessor)
                     .build();
         }
     }
@@ -169,13 +153,6 @@ public class CameraActivity extends AppCompatActivity implements FaceDetectorPro
                 mImageButtonToggleFlash.setImageResource(R.drawable.ic_flash_on_white_36dp);
                 break;
         }
-    }
-
-    private void setFaceDetectorProcessor() {
-        mFaceDetectorProcessor = FaceDetectorProcessor
-                .with(this)
-                .listener(this)
-                .build();
     }
 
     //Toggle the mCurrentLensPosition variable, then set it as the active lens

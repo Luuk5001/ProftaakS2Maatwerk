@@ -18,13 +18,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <io.fotoapparat.facedetector.view.RectanglesView
-        android:id="@+id/rectanglesView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:rectanglesColor="@color/colorAccent"
-        app:rectanglesStrokeWidth="5dp"/>
-
     <Button
         style="@style/buttonTranslucentStyle"
         android:id="@+id/buttonTakePicture"
