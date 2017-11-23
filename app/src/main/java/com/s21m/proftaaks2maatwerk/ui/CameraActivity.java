@@ -21,6 +21,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.fotoapparat.Fotoapparat;
 import io.fotoapparat.parameter.update.UpdateRequest;
+import io.fotoapparat.result.CapabilitiesResult;
 import io.fotoapparat.result.PendingResult;
 import io.fotoapparat.result.PhotoResult;
 import io.fotoapparat.view.CameraView;
@@ -34,7 +35,7 @@ import static io.fotoapparat.parameter.selector.FlashSelectors.on;
 import static io.fotoapparat.parameter.selector.LensPositionSelectors.back;
 import static io.fotoapparat.parameter.selector.LensPositionSelectors.front;
 
-public class CameraActivity extends AppCompatActivity{
+public class CameraActivity extends AppCompatActivity {
 
     private static final byte FLASH_ON = 0;
     private static final byte FLASH_OFF = 1;
@@ -45,11 +46,16 @@ public class CameraActivity extends AppCompatActivity{
     private Fotoapparat mFotoapparat;
     private int mCurrentLensPosition = FRONT_LENS;
     private byte mCurrentFlashMode = FLASH_AUTO;
+    private CapabilitiesResult mCapabilities;
+    private boolean mFrontLensAvailable = false;
+    private boolean mBackLensAvailable = false;
 
     @BindView(R.id.cameraView)
     CameraView mCameraView;
     @BindView(R.id.imageButtonToggleFlash)
     ImageButton mImageButtonToggleFlash;
+    @BindView(R.id.imageButtonSwitchCamera)
+    ImageButton mImageButtonSwitchCamera;
     @BindView(R.id.buttonTakePicture)
     Button mButtonTakePicture;
 
@@ -62,7 +68,14 @@ public class CameraActivity extends AppCompatActivity{
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        setActiveLens();
+        if(!checkLensAvailability()){
+            //TODO notify user of unavailable camera
+            finish();
+        }
+
+        configureSwitchCameraButton();
+
+        setFotoapparat();
     }
 
     @Override
@@ -113,16 +126,35 @@ public class CameraActivity extends AppCompatActivity{
         toggleFlashMode();
     }
 
+    private boolean checkLensAvailability() {
+        Fotoapparat front = Fotoapparat.with(this).into(mCameraView).lensPosition(front()).build();
+        Fotoapparat back = Fotoapparat.with(this).into(mCameraView).lensPosition(back()).build();
+        mFrontLensAvailable = front.isAvailable();
+        mBackLensAvailable = back.isAvailable();
+        if(!mFrontLensAvailable && !mBackLensAvailable){
+            return false;
+        }
+        else{
+            if(mFrontLensAvailable){
+                mCurrentLensPosition = FRONT_LENS;
+            }
+            else{
+                mCurrentLensPosition = BACK_LENS;
+            }
+            return true;
+        }
+    }
+
     //Change the camera lens in the mFotoapparat variable
-    private void setActiveLens(){
-        if(mCurrentLensPosition == FRONT_LENS){
+    private void setFotoapparat(){
+        if(mCurrentLensPosition == FRONT_LENS && mFrontLensAvailable){
             mFotoapparat = Fotoapparat
                     .with(this)
                     .into(mCameraView)
                     .lensPosition(front())
                     .build();
         }
-        else if(mCurrentLensPosition == BACK_LENS){
+        else if(mCurrentLensPosition == BACK_LENS && mBackLensAvailable){
             mFotoapparat = Fotoapparat
                     .with(this)
                     .into(mCameraView)
@@ -163,13 +195,13 @@ public class CameraActivity extends AppCompatActivity{
 
     //Toggle the mCurrentLensPosition variable, then set it as the active lens
     private void toggleActiveLens(){
-        if(mCurrentLensPosition == FRONT_LENS){
+        if(mCurrentLensPosition == FRONT_LENS && mBackLensAvailable){
             mCurrentLensPosition = BACK_LENS;
         }
-        else if(mCurrentLensPosition == BACK_LENS){
+        else if(mCurrentLensPosition == BACK_LENS && mFrontLensAvailable){
             mCurrentLensPosition = FRONT_LENS;
         }
-        setActiveLens();
+        setFotoapparat();
     }
 
     //Toggle the mCurrentFlashMode variable, then set the flash mode
@@ -193,5 +225,11 @@ public class CameraActivity extends AppCompatActivity{
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_camera);
+    }
+
+    private void configureSwitchCameraButton(){
+        if(!mFrontLensAvailable == mBackLensAvailable){
+            mImageButtonSwitchCamera.setVisibility(View.GONE);
+        }
     }
 }
