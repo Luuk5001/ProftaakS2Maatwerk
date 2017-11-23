@@ -61,7 +61,7 @@ public class CropActivity extends AppCompatActivity {
             mCropImageView.getCroppedImageAsync();
         }
        catch (IOException e){
-
+            e.printStackTrace();
        }
     }
 

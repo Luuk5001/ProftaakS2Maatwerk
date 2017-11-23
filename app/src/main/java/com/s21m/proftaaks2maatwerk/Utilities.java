@@ -23,7 +23,7 @@ public final class Utilities {
     public static final byte REQUEST_CROP = 2;
     public static final byte REQUEST_CAMERA_PERMISSION = 3;
     public static final byte REQUEST_STORAGE_PERMISSION = 4;
-    public static final byte RESULT_RETAKE = 0;
+    public static final byte RESULT_RETAKE = 10;
 
     public static void toggleProgressBar(ProgressBar bar) {
         if(bar.getVisibility() == View.INVISIBLE){

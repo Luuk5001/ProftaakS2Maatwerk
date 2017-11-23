@@ -94,7 +94,7 @@ public class CameraActivity extends AppCompatActivity{
             });
         }
         catch (IOException e){
-
+            e.printStackTrace();
         }
     }
 
