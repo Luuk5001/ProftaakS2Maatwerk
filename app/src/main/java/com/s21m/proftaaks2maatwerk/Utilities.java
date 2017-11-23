@@ -46,14 +46,8 @@ public final class Utilities {
         return isAvailable;
     }
 
-    public static File createNewTempFile(Context context, String prefix, String suffix) {
-        try{
-            return File.createTempFile(prefix, suffix, context.getCacheDir());
-        }
-        catch (IOException e){
-            e.printStackTrace();
-            return null;
-        }
+    public static File createNewTempFile(Context context, String prefix, String suffix) throws IOException {
+        return File.createTempFile(prefix, suffix, context.getCacheDir());
     }
 
     public static void saveBitmapToFile(File file, Bitmap bitmap) throws IOException {

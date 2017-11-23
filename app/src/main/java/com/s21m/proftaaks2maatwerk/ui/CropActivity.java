@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.s21m.proftaaks2maatwerk.R;
-import com.s21m.proftaaks2maatwerk.Utilities;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
@@ -42,23 +41,28 @@ public class CropActivity extends AppCompatActivity {
 
     @OnClick(R.id.buttonCropImage)
     public void onClickButtonCropImage(){
-        final File photoFile = createNewTempFile(CropActivity.this, "CROPPED", null);
-        final Uri fileUri = FileProvider.getUriForFile(getApplicationContext(), SHARED_PROVIDER_AUTHORITY, photoFile);
-        mCropImageView.setOnCropImageCompleteListener(new CropImageView.OnCropImageCompleteListener() {
-            @Override
-            public void onCropImageComplete(CropImageView view, CropImageView.CropResult result) {
-                try {
-                    saveBitmapToFile(photoFile, result.getBitmap());
-                } catch (IOException e) {
-                    e.printStackTrace();
+        try{
+            final File photoFile = createNewTempFile(CropActivity.this, "CROPPED", ".png");
+            final Uri fileUri = FileProvider.getUriForFile(getApplicationContext(), SHARED_PROVIDER_AUTHORITY, photoFile);
+            mCropImageView.setOnCropImageCompleteListener(new CropImageView.OnCropImageCompleteListener() {
+                @Override
+                public void onCropImageComplete(CropImageView view, CropImageView.CropResult result) {
+                    try {
+                        saveBitmapToFile(photoFile, result.getBitmap());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Intent data = new Intent();
+                    data.putExtra(PHOTO_URI_KEY, String.valueOf(fileUri));
+                    setResult(RESULT_OK, data);
+                    finish();
                 }
-                Intent data = new Intent();
-                data.putExtra(PHOTO_URI_KEY, String.valueOf(fileUri));
-                setResult(RESULT_OK, data);
-                finish();
-            }
-        });
-        mCropImageView.getCroppedImageAsync();
+            });
+            mCropImageView.getCroppedImageAsync();
+        }
+       catch (IOException e){
+
+       }
     }
 
     @OnClick(R.id.buttonRetakePhoto)

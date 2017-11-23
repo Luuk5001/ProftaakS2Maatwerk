@@ -4,41 +4,30 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
-import com.s21m.proftaaks2maatwerk.BuildConfig;
 import com.s21m.proftaaks2maatwerk.R;
-import com.s21m.proftaaks2maatwerk.Utilities;
 import com.s21m.proftaaks2maatwerk.data.Emotions;
 import com.s21m.proftaaks2maatwerk.data.ResultData;
-
-import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
-import static com.s21m.proftaaks2maatwerk.Utilities.CONTEXT_KEY;
 import static com.s21m.proftaaks2maatwerk.Utilities.PHOTO_URI_KEY;
 import static com.s21m.proftaaks2maatwerk.Utilities.REQUEST_CAMERA;
 import static com.s21m.proftaaks2maatwerk.Utilities.REQUEST_CAMERA_PERMISSION;
 import static com.s21m.proftaaks2maatwerk.Utilities.REQUEST_CROP;
 import static com.s21m.proftaaks2maatwerk.Utilities.REQUEST_GALLERY;
+import static com.s21m.proftaaks2maatwerk.Utilities.REQUEST_STORAGE_PERMISSION;
 import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_DATA_KEY;
 import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_RETAKE;
 
@@ -58,12 +47,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                    && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_STORAGE_PERMISSION);
+            }
+        }
         mProgressBar.setVisibility(View.INVISIBLE);
     }
 
     @OnClick(R.id.buttonTakePicture)
     public void onClickTakePicture(View view) {
-        if(ContextCompat.checkSelfPermission(this,Manifest.permission.WRITE_CALENDAR)
+        if(ContextCompat.checkSelfPermission(this,Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED){
             takePhoto();
         }
@@ -118,6 +113,17 @@ public class MainActivity extends AppCompatActivity {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     takePhoto();
+                }
+            case REQUEST_STORAGE_PERMISSION:
+                if (grantResults.length < 1
+                        || grantResults[0] == PackageManager.PERMISSION_DENIED
+                        || grantResults[1] == PackageManager.PERMISSION_DENIED) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        finishAndRemoveTask();
+                    }
+                    else{
+                        finishAffinity();
+                    }
                 }
         }
     }
