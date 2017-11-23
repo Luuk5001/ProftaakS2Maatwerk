@@ -19,7 +19,7 @@
         app:cropShowProgressBar="false"
         app:cropBorderCornerColor="@color/colorAccent"
         app:cropBorderCornerThickness="4dp"
-        app:cropBorderCornerLength="25dp"/>
+        app:cropBorderCornerLength="25dp" />
 
     <Button
         style="@style/buttonTranslucentStyle"

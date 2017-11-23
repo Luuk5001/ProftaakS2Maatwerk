@@ -21,6 +21,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.fotoapparat.Fotoapparat;
+import io.fotoapparat.parameter.Size;
 import io.fotoapparat.parameter.update.UpdateRequest;
 import io.fotoapparat.result.CapabilitiesResult;
 import io.fotoapparat.result.PendingResult;
@@ -37,6 +38,8 @@ import static io.fotoapparat.parameter.selector.FlashSelectors.off;
 import static io.fotoapparat.parameter.selector.FlashSelectors.on;
 import static io.fotoapparat.parameter.selector.LensPositionSelectors.back;
 import static io.fotoapparat.parameter.selector.LensPositionSelectors.front;
+import static io.fotoapparat.parameter.selector.SizeSelectors.biggestSize;
+import static io.fotoapparat.parameter.selector.SizeSelectors.smallestSize;
 
 public class CameraActivity extends AppCompatActivity {
 
@@ -52,6 +55,7 @@ public class CameraActivity extends AppCompatActivity {
     private CapabilitiesResult mCapabilities;
     private boolean mFrontLensAvailable = false;
     private boolean mBackLensAvailable = false;
+    private Size mPhotoSize;
 
     @BindView(R.id.cameraView)
     CameraView mCameraView;
@@ -159,6 +163,7 @@ public class CameraActivity extends AppCompatActivity {
             mFotoapparat = Fotoapparat
                     .with(this)
                     .into(mCameraView)
+                    .photoSize(biggestSize())
                     .lensPosition(front())
                     .build();
         }
@@ -166,6 +171,7 @@ public class CameraActivity extends AppCompatActivity {
             mFotoapparat = Fotoapparat
                     .with(this)
                     .into(mCameraView)
+                    .photoSize(biggestSize())
                     .lensPosition(back())
                     .build();
         }
