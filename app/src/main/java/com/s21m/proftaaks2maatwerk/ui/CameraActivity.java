@@ -14,6 +14,7 @@ import android.widget.ImageButton;
 import com.s21m.proftaaks2maatwerk.R;
 
 import java.io.File;
+import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -78,18 +79,23 @@ public class CameraActivity extends AppCompatActivity{
 
     @OnClick(R.id.buttonTakePicture)
     public void onClickButtonTakePicture(View view) {
-        final File photoFile = createNewTempFile(this, "NOCROP", null);
-        final Uri fileUri = FileProvider.getUriForFile(getApplicationContext(), SHARED_PROVIDER_AUTHORITY, photoFile);
-        PhotoResult photoResult = mFotoapparat.takePicture();
-        photoResult.saveToFile(photoFile).whenAvailable(new PendingResult.Callback<Void>() {
-            @Override
-            public void onResult(Void aVoid) {
-                Intent data = new Intent();
-                data.putExtra(PHOTO_URI_KEY, String.valueOf(fileUri));
-                setResult(RESULT_OK, data);
-                finish();
-            }
-        });
+        try {
+            final File photoFile = createNewTempFile(this, "NOCROP", null);
+            final Uri fileUri = FileProvider.getUriForFile(getApplicationContext(), SHARED_PROVIDER_AUTHORITY, photoFile);
+            PhotoResult photoResult = mFotoapparat.takePicture();
+            photoResult.saveToFile(photoFile).whenAvailable(new PendingResult.Callback<Void>() {
+                @Override
+                public void onResult(Void aVoid) {
+                    Intent data = new Intent();
+                    data.putExtra(PHOTO_URI_KEY, String.valueOf(fileUri));
+                    setResult(RESULT_OK, data);
+                    finish();
+                }
+            });
+        }
+        catch (IOException e){
+
+        }
     }
 
     @OnClick(R.id.imageButtonSwitchCamera)

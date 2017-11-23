@@ -1,14 +1,12 @@
 package com.s21m.proftaaks2maatwerk.ui;
 
-import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -30,15 +28,15 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static com.s21m.proftaaks2maatwerk.Utilities.REQUEST_STORAGE_PERMISSION;
 import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_DATA_KEY;
+import static com.s21m.proftaaks2maatwerk.Utilities.saveBitmapToFile;
 
 public class PictureTakenActivity extends AppCompatActivity {
 
     private ResultData mResult;
     private static String SHARED = "ProftaakS2Maatwerk";
 
-    private Bitmap bitmap;
+    private Bitmap mPictureBitmap;
 
     @BindView(R.id.imageViewPicture)
     ImageView mImageViewPicture;
@@ -54,10 +52,12 @@ public class PictureTakenActivity extends AppCompatActivity {
         Intent intent = getIntent();
         mResult = intent.getParcelableExtra(RESULT_DATA_KEY);
 
-        bitmap = null;
+        File file = new File(getFilesDir(), "lastPicture.png");
+
         try {
-            bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), mResult.getPictureUri());
-            mImageViewPicture.setImageBitmap(bitmap);
+            mPictureBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), mResult.getPictureUri());
+            saveBitmapToFile(file, mPictureBitmap);
+            mImageViewPicture.setImageBitmap(mPictureBitmap);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -71,24 +71,21 @@ public class PictureTakenActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        //TODO: Share image
+        switch (item.getItemId()){
+            case R.id.itemShare:
+                Intent shareIntent = new Intent();
+                shareIntent.setAction(Intent.ACTION_SEND);
+                shareIntent.putExtra(Intent.EXTRA_STREAM, mResult.getPictureUri());
+                shareIntent.setType("image/png");
+                startActivity(Intent.createChooser(shareIntent, "Share image to..."));
+                break;
+        }
         return super.onOptionsItemSelected(item);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @OnClick(R.id.buttonSavePicture)
     public void onClickButtonSavePicture(View view){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_STORAGE_PERMISSION);
-            }
-            else{
-                savePictueToGallery();
-            }
-        }
-        else{
-            savePictueToGallery();
-        }
+        savePictureToGallery();
     }
 
     @OnClick(R.id.buttonSendFeedback)
@@ -98,32 +95,8 @@ public class PictureTakenActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_STORAGE_PERMISSION: {
-
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-                } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                    Toast.makeText(PictureTakenActivity.this, "Permission denied to write your External storage", Toast.LENGTH_SHORT).show();
-                }
-                return;
-            }
-
-            // other 'case' lines to check for other
-            // permissions this app might request
-        }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void savePictueToGallery() {
+    @TargetApi(Build.VERSION_CODES.O)
+    private void savePictureToGallery() {
         String filename = LocalDateTime.now().toString() + ".png";
         File sd = new File(Environment.getExternalStorageDirectory(), SHARED);
         if(!sd.exists()){
@@ -134,7 +107,7 @@ public class PictureTakenActivity extends AppCompatActivity {
         File dest = new File(sd, filename);
         try {
             FileOutputStream out = new FileOutputStream(dest);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+            mPictureBitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
             out.flush();
             out.close();
             Toast.makeText(PictureTakenActivity.this, "Photo has been saved in images", Toast.LENGTH_LONG).show();
