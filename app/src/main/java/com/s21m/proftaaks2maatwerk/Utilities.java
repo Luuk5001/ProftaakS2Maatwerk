@@ -1,7 +1,6 @@
 package com.s21m.proftaaks2maatwerk;
 
 
-import android.app.Application;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
@@ -23,6 +22,7 @@ public final class Utilities {
     public static final byte REQUEST_GALLERY = 1;
     public static final byte REQUEST_CROP = 2;
     public static final byte REQUEST_CAMERA_PERMISSION = 3;
+    public static final byte REQUEST_STORAGE_PERMISSION = 4;
     public static final byte RESULT_RETAKE = 0;
 
     public static void toggleProgressBar(ProgressBar bar) {

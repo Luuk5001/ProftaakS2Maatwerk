@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -31,6 +30,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.s21m.proftaaks2maatwerk.Utilities.REQUEST_STORAGE_PERMISSION;
 import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_DATA_KEY;
 
 public class PictureTakenActivity extends AppCompatActivity {
@@ -78,13 +78,52 @@ public class PictureTakenActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.O)
     @OnClick(R.id.buttonSavePicture)
     public void onClickButtonSavePicture(View view){
-        // File imagePath = new File(Environment.getExternalStorageDirectory(), SHARED);
-        // File newFile = new File(imagePath, "default_image.jpg");
-        // Uri contentUri = FileProvider.getUriForFile(this, MainActivity.SHARED_PROVIDER_AUTHORITY, newFile);
-        ActivityCompat.requestPermissions(PictureTakenActivity.this,
-                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                1);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_STORAGE_PERMISSION);
+            }
+            else{
+                savePictueToGallery();
+            }
+        }
+        else{
+            savePictueToGallery();
+        }
+    }
 
+    @OnClick(R.id.buttonSendFeedback)
+    public void onButtonSendFeedbackClick(View view){
+        Intent intent = new Intent(this, FeedbackActivity.class);
+        intent.putExtra(RESULT_DATA_KEY, mResult);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_STORAGE_PERMISSION: {
+
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Toast.makeText(PictureTakenActivity.this, "Permission denied to write your External storage", Toast.LENGTH_SHORT).show();
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void savePictueToGallery() {
         String filename = LocalDateTime.now().toString() + ".png";
         File sd = new File(Environment.getExternalStorageDirectory(), SHARED);
         if(!sd.exists()){
@@ -104,38 +143,6 @@ public class PictureTakenActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(PictureTakenActivity.this, "Something went wrong: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @OnClick(R.id.buttonSendFeedback)
-    public void onButtonSendFeedbackClick(View view){
-        Intent intent = new Intent(this, FeedbackActivity.class);
-        intent.putExtra(RESULT_DATA_KEY, mResult);
-        startActivity(intent);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case 1: {
-
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-                } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                    Toast.makeText(PictureTakenActivity.this, "Permission denied to write your External storage", Toast.LENGTH_SHORT).show();
-                }
-                return;
-            }
-
-            // other 'case' lines to check for other
-            // permissions this app might request
         }
     }
 }
