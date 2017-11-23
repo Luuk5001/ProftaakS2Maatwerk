@@ -35,7 +35,6 @@ import static com.s21m.proftaaks2maatwerk.Utilities.REQUEST_GALLERY;
 import static com.s21m.proftaaks2maatwerk.Utilities.REQUEST_STORAGE_PERMISSION;
 import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_DATA_KEY;
 import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_RETAKE;
-import static com.s21m.proftaaks2maatwerk.Utilities.saveBitmapToFile;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -53,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        //Ask for storage permission
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
                     && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
@@ -66,31 +66,39 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         File file = new File(getFilesDir(), "lastPicture.png");
-        try {
-            Bitmap lastPicture = MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.fromFile(file));
-            mImageViewLastPicture.setImageBitmap(lastPicture);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(file.exists()){
+            try {
+                Bitmap lastPicture = MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.fromFile(file));
+                mImageViewLastPicture.setImageBitmap(lastPicture);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     @OnClick(R.id.buttonTakePicture)
     public void onClickTakePicture(View view) {
-        if(ContextCompat.checkSelfPermission(this,Manifest.permission.CAMERA)
-                == PackageManager.PERMISSION_GRANTED){
-            takePhoto();
+        //Ask for camera permission
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if(ContextCompat.checkSelfPermission(this,Manifest.permission.CAMERA)
+                    == PackageManager.PERMISSION_GRANTED){
+                takePhoto();
+            }
+            else{
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+            }
         }
         else{
-            ActivityCompat.requestPermissions(MainActivity.this,
-                    new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+            takePhoto();
         }
     }
 
     @OnClick(R.id.buttonOpenGallery)
     public void onClickOpenGallery(View view) {
-        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-        photoPickerIntent.setType("image/*");
-        startActivityForResult(photoPickerIntent, REQUEST_GALLERY);
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        startActivityForResult(intent, REQUEST_GALLERY);
     }
 
     @Override
@@ -133,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
                     takePhoto();
                 }
             case REQUEST_STORAGE_PERMISSION:
+                //Close application if storage permission is not granted
                 if (grantResults.length < 1
                         || grantResults[0] == PackageManager.PERMISSION_DENIED
                         || grantResults[1] == PackageManager.PERMISSION_DENIED) {
@@ -147,12 +156,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void cropPhoto(Uri imageUri) {
+        //Start the crop activity
         Intent intent = new Intent(this, CropActivity.class);
         intent.putExtra(PHOTO_URI_KEY ,String.valueOf(imageUri));
         startActivityForResult(intent, REQUEST_CROP);
     }
 
     private void takePhoto(){
+        //Start the camera activity
         Intent intent = new Intent(this, CameraActivity.class);
         startActivityForResult(intent, REQUEST_CAMERA);
     }

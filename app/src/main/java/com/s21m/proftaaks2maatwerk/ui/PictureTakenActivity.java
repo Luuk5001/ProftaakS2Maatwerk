@@ -29,6 +29,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_DATA_KEY;
+import static com.s21m.proftaaks2maatwerk.Utilities.deleteCache;
 import static com.s21m.proftaaks2maatwerk.Utilities.saveBitmapToFile;
 
 public class PictureTakenActivity extends AppCompatActivity {
@@ -81,6 +82,12 @@ public class PictureTakenActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        deleteCache(this);
     }
 
     @OnClick(R.id.buttonSavePicture)

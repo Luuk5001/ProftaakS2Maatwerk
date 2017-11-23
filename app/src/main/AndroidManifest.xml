@@ -34,22 +34,22 @@
         </activity>
         <activity
             android:name=".ui.PictureTakenActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.MainActivity"/>
         <activity
             android:name=".ui.FeedbackActivity"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
-            android:theme="@style/Base.Theme.AppCompat"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.PictureTakenActivity"/>
         <activity
             android:name=".ui.CameraActivity"
             android:theme="@style/NoActionBar"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.MainActivity"/>
         <activity
             android:name=".ui.CropActivity"
             android:theme="@style/NoActionBar"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.MainActivity"/>
     </application>
 
 </manifest>
