@@ -3,9 +3,11 @@ package com.s21m.proftaaks2maatwerk.ui;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -17,6 +19,9 @@ import android.widget.ProgressBar;
 import com.s21m.proftaaks2maatwerk.R;
 import com.s21m.proftaaks2maatwerk.data.Emotions;
 import com.s21m.proftaaks2maatwerk.data.ResultData;
+
+import java.io.File;
+import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,6 +35,7 @@ import static com.s21m.proftaaks2maatwerk.Utilities.REQUEST_GALLERY;
 import static com.s21m.proftaaks2maatwerk.Utilities.REQUEST_STORAGE_PERMISSION;
 import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_DATA_KEY;
 import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_RETAKE;
+import static com.s21m.proftaaks2maatwerk.Utilities.saveBitmapToFile;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,6 +60,18 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         mProgressBar.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        File file = new File(getFilesDir(), "lastPicture.png");
+        try {
+            Bitmap lastPicture = MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.fromFile(file));
+            mImageViewLastPicture.setImageBitmap(lastPicture);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @OnClick(R.id.buttonTakePicture)

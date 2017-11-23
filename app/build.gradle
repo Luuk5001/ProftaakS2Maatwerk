@@ -40,5 +40,4 @@ dependencies {
     annotationProcessor 'org.parceler:parceler:1.1.9'
     compile 'com.theartofdev.edmodo:android-image-cropper:2.5.1'
     compile 'io.fotoapparat.fotoapparat:library:1.4.1'
-    compile 'io.fotoapparat:facedetector:1.0.0'
 }
