@@ -57,14 +57,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        //Ask for storage permission
+        //Ask for external storage read and write permissions
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
                     && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
                 requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_STORAGE_PERMISSION);
             }
         }
-        mProgressBar.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -144,10 +143,10 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode){
             case REQUEST_CAMERA_PERMISSION:
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     takePhoto();
                 }
+                break;
             case REQUEST_STORAGE_PERMISSION:
                 //Close application if storage permission is not granted
                 if (grantResults.length < 1
@@ -160,7 +159,9 @@ public class MainActivity extends AppCompatActivity {
                         finishAffinity();
                     }
                 }
+                break;
         }
+        grantResults = null;
     }
 
     private void cropPhoto(Uri imageUri) {

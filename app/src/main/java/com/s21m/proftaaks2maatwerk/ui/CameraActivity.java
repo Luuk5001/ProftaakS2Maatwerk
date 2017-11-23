@@ -10,6 +10,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 
 import com.s21m.proftaaks2maatwerk.R;
 
@@ -30,6 +31,7 @@ import static com.s21m.proftaaks2maatwerk.Utilities.PHOTO_URI_KEY;
 import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_CAMERA_UNAVAILABLE;
 import static com.s21m.proftaaks2maatwerk.Utilities.SHARED_PROVIDER_AUTHORITY;
 import static com.s21m.proftaaks2maatwerk.Utilities.createNewTempFile;
+import static com.s21m.proftaaks2maatwerk.Utilities.toggleProgressBar;
 import static io.fotoapparat.parameter.selector.FlashSelectors.autoFlash;
 import static io.fotoapparat.parameter.selector.FlashSelectors.off;
 import static io.fotoapparat.parameter.selector.FlashSelectors.on;
@@ -59,6 +61,8 @@ public class CameraActivity extends AppCompatActivity {
     ImageButton mImageButtonSwitchCamera;
     @BindView(R.id.buttonTakePicture)
     Button mButtonTakePicture;
+    @BindView(R.id.progressBarCamera)
+    ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +97,7 @@ public class CameraActivity extends AppCompatActivity {
 
     @OnClick(R.id.buttonTakePicture)
     public void onClickButtonTakePicture(View view) {
+        toggleProgressBar(mProgressBar);
         try {
             final File photoFile = createNewTempFile(this, "NOCROP", null);
             final Uri fileUri = FileProvider.getUriForFile(getApplicationContext(), SHARED_PROVIDER_AUTHORITY, photoFile);
@@ -100,6 +105,7 @@ public class CameraActivity extends AppCompatActivity {
             photoResult.saveToFile(photoFile).whenAvailable(new PendingResult.Callback<Void>() {
                 @Override
                 public void onResult(Void aVoid) {
+                    toggleProgressBar(mProgressBar);
                     Intent data = new Intent();
                     data.putExtra(PHOTO_URI_KEY, String.valueOf(fileUri));
                     setResult(RESULT_OK, data);
@@ -108,6 +114,7 @@ public class CameraActivity extends AppCompatActivity {
             });
         }
         catch (IOException e){
+            toggleProgressBar(mProgressBar);
             e.printStackTrace();
         }
     }

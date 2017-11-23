@@ -5,7 +5,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.s21m.proftaaks2maatwerk.R;
 import com.theartofdev.edmodo.cropper.CropImageView;
@@ -22,11 +24,16 @@ import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_RETAKE;
 import static com.s21m.proftaaks2maatwerk.Utilities.SHARED_PROVIDER_AUTHORITY;
 import static com.s21m.proftaaks2maatwerk.Utilities.createNewTempFile;
 import static com.s21m.proftaaks2maatwerk.Utilities.saveBitmapToFile;
+import static com.s21m.proftaaks2maatwerk.Utilities.toggleProgressBar;
 
 public class CropActivity extends AppCompatActivity {
 
+    private static String TAG = CropActivity.class.getSimpleName();
+
     @BindView(R.id.cropImageView)
     CropImageView mCropImageView;
+    @BindView(R.id.progressBarCrop)
+    ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +48,7 @@ public class CropActivity extends AppCompatActivity {
 
     @OnClick(R.id.buttonCropImage)
     public void onClickButtonCropImage(){
+        toggleProgressBar(mProgressBar);
         try{
             final File photoFile = createNewTempFile(CropActivity.this, "CROPPED", ".png");
             final Uri fileUri = FileProvider.getUriForFile(getApplicationContext(), SHARED_PROVIDER_AUTHORITY, photoFile);
@@ -49,18 +57,23 @@ public class CropActivity extends AppCompatActivity {
                 public void onCropImageComplete(CropImageView view, CropImageView.CropResult result) {
                     try {
                         saveBitmapToFile(photoFile, result.getBitmap());
+                        toggleProgressBar(mProgressBar);
+                        Intent data = new Intent();
+                        data.putExtra(PHOTO_URI_KEY, String.valueOf(fileUri));
+                        setResult(RESULT_OK, data);
+                        finish();
                     } catch (IOException e) {
+                        toggleProgressBar(mProgressBar);
+                        Log.e(TAG, "Failed to save cropped bitmap");
                         e.printStackTrace();
+                        finish();
                     }
-                    Intent data = new Intent();
-                    data.putExtra(PHOTO_URI_KEY, String.valueOf(fileUri));
-                    setResult(RESULT_OK, data);
-                    finish();
                 }
             });
             mCropImageView.getCroppedImageAsync();
         }
        catch (IOException e){
+            toggleProgressBar(mProgressBar);
             e.printStackTrace();
        }
     }

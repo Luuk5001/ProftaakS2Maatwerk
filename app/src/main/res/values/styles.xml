@@ -44,4 +44,6 @@
     <style name="spinnerStyle" parent="Base.Widget.AppCompat.Spinner">
         <item name="android:popupBackground">@color/colorPrimaryDark</item>
     </style>
+
+
 </resources>
