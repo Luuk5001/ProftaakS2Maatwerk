@@ -13,21 +13,37 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.s21m.proftaaks2maatwerk.R;
-import com.s21m.proftaaks2maatwerk.data.Emotions;
+import com.s21m.proftaaks2maatwerk.Utilities;
 import com.s21m.proftaaks2maatwerk.data.ResultData;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 import static com.s21m.proftaaks2maatwerk.Utilities.PHOTO_URI_KEY;
 import static com.s21m.proftaaks2maatwerk.Utilities.REQUEST_CAMERA;
@@ -38,6 +54,8 @@ import static com.s21m.proftaaks2maatwerk.Utilities.REQUEST_STORAGE_PERMISSION;
 import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_CAMERA_UNAVAILABLE;
 import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_DATA_KEY;
 import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_RETAKE;
+import static com.s21m.proftaaks2maatwerk.Utilities.createNewTempFile;
+import static com.s21m.proftaaks2maatwerk.Utilities.toggleProgressBar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -86,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             if(ContextCompat.checkSelfPermission(this,Manifest.permission.CAMERA)
                     == PackageManager.PERMISSION_GRANTED){
-                takePhoto();
+                startPhotoActivity();
             }
             else{
                 ActivityCompat.requestPermissions(MainActivity.this,
@@ -94,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         else{
-            takePhoto();
+            startPhotoActivity();
         }
     }
 
@@ -113,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
             case REQUEST_CAMERA:
                 if(resultCode == RESULT_OK){
                     Uri imageUri = Uri.parse(data.getStringExtra(PHOTO_URI_KEY));
-                    cropPhoto(imageUri);
+                    startCropPhotoActivity(imageUri);
                 }
                 else if(resultCode == RESULT_CAMERA_UNAVAILABLE){
                     Toast.makeText(this, "The photo camera on this device is either unavailable or unsupported.", Toast.LENGTH_LONG).show();
@@ -123,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
             case REQUEST_GALLERY:
                 if (resultCode == RESULT_OK){
                     Uri imageUri = data.getData();
-                    cropPhoto(imageUri);
+                    startCropPhotoActivity(imageUri);
                 }
                 break;
 
@@ -133,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
                     sendPhoto(imageUri);
                 }
                 else if(resultCode == RESULT_RETAKE){
-                    takePhoto();
+                    startPhotoActivity();
                 }
         }
     }
@@ -144,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode){
             case REQUEST_CAMERA_PERMISSION:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    takePhoto();
+                    startPhotoActivity();
                 }
                 break;
             case REQUEST_STORAGE_PERMISSION:
@@ -164,70 +182,100 @@ public class MainActivity extends AppCompatActivity {
         grantResults = null;
     }
 
-    private void cropPhoto(Uri imageUri) {
+    private void startCropPhotoActivity(Uri imageUri) {
         //Start the crop activity
         Intent intent = new Intent(this, CropActivity.class);
         intent.putExtra(PHOTO_URI_KEY ,String.valueOf(imageUri));
         startActivityForResult(intent, REQUEST_CROP);
     }
 
-    private void takePhoto(){
+    private void startPhotoActivity(){
         //Start the camera activity
         Intent intent = new Intent(this, CameraActivity.class);
         startActivityForResult(intent, REQUEST_CAMERA);
     }
 
     private void sendPhoto(final Uri imageUri){
-        String apiKey = "";
-        String apiLink = "http://test.nl";
-
-        mResult = new ResultData(imageUri, 24, Emotions.Fear);
-
-        Intent intent = new Intent(getBaseContext(), PictureTakenActivity.class);
-        intent.putExtra(RESULT_DATA_KEY, mResult);
-        startActivity(intent);
-
-        /*
-
         if(Utilities.isNetworkAvailable(this)){
-            Utilities.toggleProgressBar(mProgressBar);
+
+            toggleProgressBar(this, mProgressBar);
+
+            String apiUrl = "http://i359079.venus.fhict.nl/api/Classifier";
+            File img = null;
+            try {
+                img = getTempToSendFile(imageUri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            RequestBody body = new MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart("pic", "pic.png",
+                            RequestBody.create(MediaType.parse("image/png"), img))
+                    .build();
+
+            Request request = new Request.Builder()
+                    .url(apiUrl)
+                    .post(body)
+                    .build();
 
             OkHttpClient client = new OkHttpClient();
-            Request request = new Request.Builder().url(apiLink).build();
             Call call = client.newCall(request);
-
             call.enqueue(new Callback() {
                 @Override
                 public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                    Utilities.toggleProgressBar(mProgressBar);
-
-                    Log.w(TAG, "Connection to API failed");
                     e.printStackTrace();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            toggleProgressBar(MainActivity.this, mProgressBar);
+                        }
+                    });
                 }
 
                 @Override
                 public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                    Utilities.toggleProgressBar(mProgressBar);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            toggleProgressBar(MainActivity.this, mProgressBar);
+                        }
+                    });
+                    try{
+                        ResponseBody body = response.body();
+                        String jsonData = body != null ? body.string() : null;
 
-                    Log.d(TAG, "API responded with " + response);
+                        mResult = parseResult(jsonData, imageUri);
 
-                    mResult = new ResultData(imageUri, 24, Emotions.Fear);
-
-                    Intent intent = new Intent(getBaseContext(), PictureTakenActivity.class);
-                    intent.putExtra(RESULT_KEY, mResult);
-                    startActivity(intent);
+                        Intent intent = new Intent(getBaseContext(), PictureTakenActivity.class);
+                        intent.putExtra(RESULT_DATA_KEY, mResult);
+                        startActivity(intent);
+                    }
+                    catch (Exception e){
+                        e.printStackTrace();
+                    }
                 }
             });
         }
         else{
-            Toast.makeText(this, "No network connection available", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Network unavailable", Toast.LENGTH_SHORT).show();
         }
-        */
     }
 
-    private void configureTakePictureButton(){
-        if (!this.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
-            mTakePictureButton.setVisibility(View.GONE);
-        }
+    private File getTempToSendFile(Uri imageUri) throws IOException {
+        InputStream inputStream = getContentResolver().openInputStream(imageUri);
+        byte[] buffer = new byte[inputStream.available()];
+        inputStream.read(buffer);
+        File tempFile = createNewTempFile(this, "toSend", ".png");
+        OutputStream outStream = new FileOutputStream(tempFile);
+        outStream.write(buffer);
+        return tempFile;
+    }
+
+    private ResultData parseResult(String jsonData, Uri imageUri) throws JSONException, IllegalArgumentException {
+        JSONObject data = new JSONObject(jsonData);
+        int age = data.getInt("Age");
+        String emotion = data.getString("Emotion");
+        return new ResultData(imageUri, age, emotion);
     }
 }

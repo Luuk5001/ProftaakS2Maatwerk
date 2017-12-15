@@ -48,7 +48,7 @@ public class CropActivity extends AppCompatActivity {
 
     @OnClick(R.id.buttonCropImage)
     public void onClickButtonCropImage(){
-        toggleProgressBar(mProgressBar);
+        toggleProgressBar(this, mProgressBar);
         try{
             final File photoFile = createNewTempFile(CropActivity.this, "CROPPED", ".png");
             final Uri fileUri = FileProvider.getUriForFile(getApplicationContext(), SHARED_PROVIDER_AUTHORITY, photoFile);
@@ -57,13 +57,13 @@ public class CropActivity extends AppCompatActivity {
                 public void onCropImageComplete(CropImageView view, CropImageView.CropResult result) {
                     try {
                         saveBitmapToFile(photoFile, result.getBitmap());
-                        toggleProgressBar(mProgressBar);
+                        toggleProgressBar(CropActivity.this, mProgressBar);
                         Intent data = new Intent();
                         data.putExtra(PHOTO_URI_KEY, String.valueOf(fileUri));
                         setResult(RESULT_OK, data);
                         finish();
                     } catch (IOException e) {
-                        toggleProgressBar(mProgressBar);
+                        toggleProgressBar(CropActivity.this, mProgressBar);
                         Log.e(TAG, "Failed to save cropped bitmap");
                         e.printStackTrace();
                         finish();
@@ -73,7 +73,7 @@ public class CropActivity extends AppCompatActivity {
             mCropImageView.getCroppedImageAsync();
         }
        catch (IOException e){
-            toggleProgressBar(mProgressBar);
+            toggleProgressBar(this, mProgressBar);
             e.printStackTrace();
        }
     }

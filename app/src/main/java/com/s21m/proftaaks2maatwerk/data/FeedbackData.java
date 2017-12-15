@@ -4,9 +4,9 @@ package com.s21m.proftaaks2maatwerk.data;
 public class FeedbackData {
     private ResultData mOriginalResult;
     private int mCorrectedAge;
-    private Emotions mCorrectedEmotion;
+    private String mCorrectedEmotion;
 
-    public FeedbackData(ResultData originalResult, int correctedAge, Emotions correctedEmotion){
+    public FeedbackData(ResultData originalResult, int correctedAge, String correctedEmotion){
         mOriginalResult = originalResult;
         mCorrectedAge = correctedAge;
         mCorrectedEmotion = correctedEmotion;
@@ -20,13 +20,13 @@ public class FeedbackData {
         return mCorrectedAge;
     }
 
-    public Emotions getmCorrectedEmotion() {
+    public String getmCorrectedEmotion() {
         return mCorrectedEmotion;
     }
 
     @Override
     public String toString() {
         return this.getClass().getSimpleName() + ":\n" + "\tAge:" + mCorrectedAge + "\n\tEmotion:"
-                + mCorrectedEmotion.name() + "\n" + mOriginalResult.toString();
+                + mCorrectedEmotion + "\n" + mOriginalResult.toString();
     }
 }

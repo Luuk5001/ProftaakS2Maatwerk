@@ -72,6 +72,7 @@
         app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/cropImageView" />
+        app:layout_constraintTop_toTopOf="@+id/cropImageView"
+        tools:visibility="visible" />
 
 </android.support.constraint.ConstraintLayout>

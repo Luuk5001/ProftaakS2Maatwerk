@@ -101,7 +101,7 @@ public class CameraActivity extends AppCompatActivity {
 
     @OnClick(R.id.buttonTakePicture)
     public void onClickButtonTakePicture(View view) {
-        toggleProgressBar(mProgressBar);
+        toggleProgressBar(this, mProgressBar);
         try {
             final File photoFile = createNewTempFile(this, "NOCROP", null);
             final Uri fileUri = FileProvider.getUriForFile(getApplicationContext(), SHARED_PROVIDER_AUTHORITY, photoFile);
@@ -109,7 +109,7 @@ public class CameraActivity extends AppCompatActivity {
             photoResult.saveToFile(photoFile).whenAvailable(new PendingResult.Callback<Void>() {
                 @Override
                 public void onResult(Void aVoid) {
-                    toggleProgressBar(mProgressBar);
+                    toggleProgressBar(CameraActivity.this, mProgressBar);
                     Intent data = new Intent();
                     data.putExtra(PHOTO_URI_KEY, String.valueOf(fileUri));
                     setResult(RESULT_OK, data);
@@ -118,7 +118,7 @@ public class CameraActivity extends AppCompatActivity {
             });
         }
         catch (IOException e){
-            toggleProgressBar(mProgressBar);
+            toggleProgressBar(CameraActivity.this, mProgressBar);
             e.printStackTrace();
         }
     }

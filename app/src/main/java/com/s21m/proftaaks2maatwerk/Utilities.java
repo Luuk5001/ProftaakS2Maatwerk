@@ -1,11 +1,13 @@
 package com.s21m.proftaaks2maatwerk;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ProgressBar;
 
 import java.io.File;
@@ -26,12 +28,16 @@ public final class Utilities {
     public static final byte RESULT_RETAKE = 10;
     public static final byte RESULT_CAMERA_UNAVAILABLE = 11;
 
-    public static void toggleProgressBar(ProgressBar bar) {
+    public static void toggleProgressBar(Activity activity, ProgressBar bar) {
         if(bar.getVisibility() == View.INVISIBLE){
             bar.setVisibility(View.VISIBLE);
+            activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
         }
         else{
             bar.setVisibility(View.INVISIBLE);
+            activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         }
     }
 

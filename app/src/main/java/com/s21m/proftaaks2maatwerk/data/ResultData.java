@@ -8,9 +8,9 @@ public class ResultData implements Parcelable {
 
     private Uri mPictureUri;
     private int mAge;
-    private Emotions mEmotion;
+    private String mEmotion;
 
-    public ResultData(Uri pictureUri, int age, Emotions emotion)
+    public ResultData(Uri pictureUri, int age, String emotion)
     {
         this.mPictureUri = pictureUri;
         this.mAge = age;
@@ -20,7 +20,7 @@ public class ResultData implements Parcelable {
     protected ResultData(Parcel in) {
         mPictureUri = Uri.parse(in.readString());
         mAge = in.readInt();
-        mEmotion = Emotions.valueOf(in.readString());
+        mEmotion = in.readString();
     }
 
     public Uri getPictureUri() {
@@ -31,7 +31,7 @@ public class ResultData implements Parcelable {
         return mAge;
     }
 
-    public Emotions getEmotion() {
+    public String getEmotion() {
         return mEmotion;
     }
 
@@ -44,7 +44,7 @@ public class ResultData implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(mPictureUri.toString());
         parcel.writeInt(mAge);
-        parcel.writeString(this.mEmotion.name());
+        parcel.writeString(mEmotion);
     }
 
     public static final Creator<ResultData> CREATOR = new Creator<ResultData>() {
@@ -61,6 +61,6 @@ public class ResultData implements Parcelable {
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + ":\n" + "\tAge:" + mAge + "\n\tEmotion:" + mEmotion.name();
+        return this.getClass().getSimpleName() + ":\n" + "\tAge:" + mAge + "\n\tEmotion:" + mEmotion;
     }
 }
