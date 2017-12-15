@@ -1,6 +1,7 @@
 package com.s21m.proftaaks2maatwerk.ui;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -20,6 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.s21m.proftaaks2maatwerk.R;
+import com.s21m.proftaaks2maatwerk.SendPhotoToAPI;
 import com.s21m.proftaaks2maatwerk.Utilities;
 import com.s21m.proftaaks2maatwerk.data.ResultData;
 
@@ -60,8 +62,6 @@ import static com.s21m.proftaaks2maatwerk.Utilities.toggleProgressBar;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-
-    private ResultData mResult;
 
     @BindView(R.id.imageViewLastPicture)
     ImageView mImageViewLastPicture;
@@ -144,15 +144,6 @@ public class MainActivity extends AppCompatActivity {
                     startCropPhotoActivity(imageUri);
                 }
                 break;
-
-            case REQUEST_CROP:
-                if(resultCode == RESULT_OK){
-                    Uri imageUri = Uri.parse(data.getStringExtra(PHOTO_URI_KEY));
-                    sendPhoto(imageUri);
-                }
-                else if(resultCode == RESULT_RETAKE){
-                    startPhotoActivity();
-                }
         }
     }
 
@@ -193,89 +184,5 @@ public class MainActivity extends AppCompatActivity {
         //Start the camera activity
         Intent intent = new Intent(this, CameraActivity.class);
         startActivityForResult(intent, REQUEST_CAMERA);
-    }
-
-    private void sendPhoto(final Uri imageUri){
-        if(Utilities.isNetworkAvailable(this)){
-
-            toggleProgressBar(this, mProgressBar);
-
-            String apiUrl = "http://i359079.venus.fhict.nl/api/Classifier";
-            File img = null;
-            try {
-                img = getTempToSendFile(imageUri);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            RequestBody body = new MultipartBody.Builder()
-                    .setType(MultipartBody.FORM)
-                    .addFormDataPart("pic", "pic.png",
-                            RequestBody.create(MediaType.parse("image/png"), img))
-                    .build();
-
-            Request request = new Request.Builder()
-                    .url(apiUrl)
-                    .post(body)
-                    .build();
-
-            OkHttpClient client = new OkHttpClient();
-            Call call = client.newCall(request);
-            call.enqueue(new Callback() {
-                @Override
-                public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                    e.printStackTrace();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            toggleProgressBar(MainActivity.this, mProgressBar);
-                        }
-                    });
-                }
-
-                @Override
-                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            toggleProgressBar(MainActivity.this, mProgressBar);
-                        }
-                    });
-                    try{
-                        ResponseBody body = response.body();
-                        String jsonData = body != null ? body.string() : null;
-
-                        mResult = parseResult(jsonData, imageUri);
-
-                        Intent intent = new Intent(getBaseContext(), PictureTakenActivity.class);
-                        intent.putExtra(RESULT_DATA_KEY, mResult);
-                        startActivity(intent);
-                    }
-                    catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            });
-        }
-        else{
-            Toast.makeText(this, "Network unavailable", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private File getTempToSendFile(Uri imageUri) throws IOException {
-        InputStream inputStream = getContentResolver().openInputStream(imageUri);
-        byte[] buffer = new byte[inputStream.available()];
-        inputStream.read(buffer);
-        File tempFile = createNewTempFile(this, "toSend", ".png");
-        OutputStream outStream = new FileOutputStream(tempFile);
-        outStream.write(buffer);
-        return tempFile;
-    }
-
-    private ResultData parseResult(String jsonData, Uri imageUri) throws JSONException, IllegalArgumentException {
-        JSONObject data = new JSONObject(jsonData);
-        int age = data.getInt("Age");
-        String emotion = data.getString("Emotion");
-        return new ResultData(imageUri, age, emotion);
     }
 }

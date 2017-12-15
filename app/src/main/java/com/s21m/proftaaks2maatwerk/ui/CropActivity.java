@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.s21m.proftaaks2maatwerk.R;
+import com.s21m.proftaaks2maatwerk.SendPhotoToAPI;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
@@ -57,11 +58,7 @@ public class CropActivity extends AppCompatActivity {
                 public void onCropImageComplete(CropImageView view, CropImageView.CropResult result) {
                     try {
                         saveBitmapToFile(photoFile, result.getBitmap());
-                        toggleProgressBar(CropActivity.this, mProgressBar);
-                        Intent data = new Intent();
-                        data.putExtra(PHOTO_URI_KEY, String.valueOf(fileUri));
-                        setResult(RESULT_OK, data);
-                        finish();
+                        SendPhotoToAPI.sendPhoto(CropActivity.this, fileUri);
                     } catch (IOException e) {
                         toggleProgressBar(CropActivity.this, mProgressBar);
                         Log.e(TAG, "Failed to save cropped bitmap");
