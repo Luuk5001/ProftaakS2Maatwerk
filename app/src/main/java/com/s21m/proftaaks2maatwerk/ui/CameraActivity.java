@@ -21,18 +21,15 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.fotoapparat.Fotoapparat;
-import io.fotoapparat.parameter.Size;
 import io.fotoapparat.parameter.update.UpdateRequest;
-import io.fotoapparat.result.CapabilitiesResult;
 import io.fotoapparat.result.PendingResult;
 import io.fotoapparat.result.PhotoResult;
 import io.fotoapparat.view.CameraView;
 
-import static com.s21m.proftaaks2maatwerk.Utilities.PHOTO_URI_KEY;
-import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_CAMERA_UNAVAILABLE;
-import static com.s21m.proftaaks2maatwerk.Utilities.SHARED_PROVIDER_AUTHORITY;
-import static com.s21m.proftaaks2maatwerk.Utilities.createNewTempFile;
-import static com.s21m.proftaaks2maatwerk.Utilities.toggleProgressBar;
+import static com.s21m.proftaaks2maatwerk.utils.Utils.PHOTO_URI_KEY;
+import static com.s21m.proftaaks2maatwerk.utils.Utils.RESULT_CAMERA_UNAVAILABLE;
+import static com.s21m.proftaaks2maatwerk.utils.Utils.SHARED_PROVIDER_AUTHORITY;
+import static com.s21m.proftaaks2maatwerk.utils.Utils.createNewCacheFile;
 import static io.fotoapparat.parameter.selector.FlashSelectors.autoFlash;
 import static io.fotoapparat.parameter.selector.FlashSelectors.off;
 import static io.fotoapparat.parameter.selector.FlashSelectors.on;
@@ -101,15 +98,13 @@ public class CameraActivity extends AppCompatActivity {
 
     @OnClick(R.id.buttonTakePicture)
     public void onClickButtonTakePicture(View view) {
-        toggleProgressBar(this, mProgressBar);
         try {
-            final File photoFile = createNewTempFile(this, "NOCROP", null);
+            final File photoFile = createNewCacheFile(this, "NOCROP", null);
             final Uri fileUri = FileProvider.getUriForFile(getApplicationContext(), SHARED_PROVIDER_AUTHORITY, photoFile);
             PhotoResult photoResult = mFotoapparat.takePicture();
             photoResult.saveToFile(photoFile).whenAvailable(new PendingResult.Callback<Void>() {
                 @Override
                 public void onResult(Void aVoid) {
-                    toggleProgressBar(CameraActivity.this, mProgressBar);
                     Intent data = new Intent();
                     data.putExtra(PHOTO_URI_KEY, String.valueOf(fileUri));
                     setResult(RESULT_OK, data);
@@ -118,7 +113,6 @@ public class CameraActivity extends AppCompatActivity {
             });
         }
         catch (IOException e){
-            toggleProgressBar(CameraActivity.this, mProgressBar);
             e.printStackTrace();
         }
     }

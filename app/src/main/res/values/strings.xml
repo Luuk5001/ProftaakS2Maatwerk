@@ -19,9 +19,11 @@
     <string name="main_open_gallery_button">Open gallery</string>
     <string name="main_take_picture_button">Open camera</string>
     <string name="last_picture_content_description">Last picture taken with this app</string>
-    <string name="taken_send_feedback_button">Send</string>
-    <string name="taken_save_picture_button">Save</string>
+    <string name="taken_send_feedback_button">Send feedback</string>
+    <string name="taken_save_picture_button">Save to gallery</string>
     <string name="taken_picture">Picture you just took</string>
     <string name="send_photo_failure">Failed to send photo</string>
     <string name="toast_crop_error">Error while cropping image</string>
+    <string name="result_image_age_suffix">years old</string>
+    <string name="result_image_bottom_bar_text">Proftaak S2M project</string>
 </resources>

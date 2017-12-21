@@ -1,6 +1,5 @@
 package com.s21m.proftaaks2maatwerk.ui;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,9 +12,9 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.s21m.proftaaks2maatwerk.R;
-import com.s21m.proftaaks2maatwerk.Utilities;
-import com.s21m.proftaaks2maatwerk.data.FeedbackData;
-import com.s21m.proftaaks2maatwerk.data.ResultData;
+import com.s21m.proftaaks2maatwerk.data.Feedback;
+import com.s21m.proftaaks2maatwerk.data.PhotoResult;
+import com.s21m.proftaaks2maatwerk.utils.Utils;
 
 import org.json.JSONArray;
 
@@ -32,14 +31,13 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_DATA_KEY;
-import static com.s21m.proftaaks2maatwerk.Utilities.toggleProgressBar;
+import static com.s21m.proftaaks2maatwerk.utils.Utils.RESULT_DATA_KEY;
 
 public class FeedbackActivity extends AppCompatActivity {
 
     private static final String TAG = FeedbackActivity.class.getSimpleName();
 
-    private ResultData mResultData;
+    private PhotoResult mPhotoResult;
     private Integer[] mAge;
     private String[] mEmotions;
     private ArrayAdapter<String> emotionsArrayAdapter;
@@ -58,9 +56,9 @@ public class FeedbackActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         Intent intent = getIntent();
-        mResultData = intent.getParcelableExtra(RESULT_DATA_KEY);
+        mPhotoResult = intent.getParcelableExtra(RESULT_DATA_KEY);
 
-        if(mResultData == null){
+        if(mPhotoResult == null){
             Toast.makeText(getApplicationContext(), R.string.toast_error, Toast.LENGTH_LONG).show();
             Log.e(TAG, "Result data is null, closing activity");
             finish();
@@ -79,10 +77,10 @@ public class FeedbackActivity extends AppCompatActivity {
         int age = (int)mSpinnerAge.getSelectedItem();
         String emotion = (String)mSpinnerEmotion.getSelectedItem();
 
-        FeedbackData feedbackData = new FeedbackData(mResultData, age, emotion);
+        Feedback feedback = new Feedback(mPhotoResult, age, emotion);
 
-        Toast.makeText(getApplicationContext(), feedbackData.toString(), Toast.LENGTH_LONG).show();
-        Log.i(TAG, "Feedback data sent:\n" + feedbackData.toString());
+        Toast.makeText(getApplicationContext(), feedback.toString(), Toast.LENGTH_LONG).show();
+        Log.i(TAG, "Feedback data sent:\n" + feedback.toString());
 
         finish();
     }
@@ -93,10 +91,10 @@ public class FeedbackActivity extends AppCompatActivity {
     }
 
     private void updateUI() {
-        int index = Arrays.asList(mAge).indexOf(mResultData.getAge());
+        int index = Arrays.asList(mAge).indexOf(mPhotoResult.getAge());
         mSpinnerAge.setSelection(index);
-        if (mResultData.getEmotion() != null) {
-            int spinnerPosition = emotionsArrayAdapter.getPosition(mResultData.getEmotion());
+        if (mPhotoResult.getEmotion() != null) {
+            int spinnerPosition = emotionsArrayAdapter.getPosition(mPhotoResult.getEmotion());
             mSpinnerEmotion.setSelection(spinnerPosition);
         }
     }
@@ -110,9 +108,7 @@ public class FeedbackActivity extends AppCompatActivity {
     }
 
     private void getEmotions(){
-        if(Utilities.isNetworkAvailable(this)){
-
-            toggleProgressBar(this, progressBar);
+        if(Utils.isNetworkAvailable(this)){
 
             String apiUrl = this.getString(R.string.api_url);
 
@@ -125,7 +121,6 @@ public class FeedbackActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            toggleProgressBar(FeedbackActivity.this, progressBar);
                         }
                     });
                     e.printStackTrace();
@@ -143,7 +138,6 @@ public class FeedbackActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            toggleProgressBar(FeedbackActivity.this, progressBar);
                         }
                     });
                     try{

@@ -11,7 +11,6 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.s21m.proftaaks2maatwerk.R;
-import com.s21m.proftaaks2maatwerk.SendPhotoToAPI;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
@@ -21,14 +20,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static com.s21m.proftaaks2maatwerk.Utilities.PHOTO_URI_KEY;
-import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_RETAKE;
-import static com.s21m.proftaaks2maatwerk.Utilities.SHARED_PROVIDER_AUTHORITY;
-import static com.s21m.proftaaks2maatwerk.Utilities.createNewTempFile;
-import static com.s21m.proftaaks2maatwerk.Utilities.deleteCache;
-import static com.s21m.proftaaks2maatwerk.Utilities.getResizedBitmap;
-import static com.s21m.proftaaks2maatwerk.Utilities.saveBitmapToFile;
-import static com.s21m.proftaaks2maatwerk.Utilities.toggleProgressBar;
+import static com.s21m.proftaaks2maatwerk.utils.Utils.PHOTO_URI_KEY;
+import static com.s21m.proftaaks2maatwerk.utils.Utils.RESULT_RETAKE;
+import static com.s21m.proftaaks2maatwerk.utils.Utils.SHARED_PROVIDER_AUTHORITY;
+import static com.s21m.proftaaks2maatwerk.utils.Utils.createNewCacheFile;
+import static com.s21m.proftaaks2maatwerk.utils.Utils.getResizedBitmap;
+import static com.s21m.proftaaks2maatwerk.utils.Utils.saveBitmapToFile;
 
 public class CropActivity extends AppCompatActivity {
 
@@ -54,19 +51,18 @@ public class CropActivity extends AppCompatActivity {
 
     @OnClick(R.id.buttonCropImage)
     public void onClickButtonCropImage(){
-        toggleProgressBar(this, mProgressBar);
         mCropImageView.setOnCropImageCompleteListener(new CropImageView.OnCropImageCompleteListener() {
             @Override
             public void onCropImageComplete(CropImageView view, CropImageView.CropResult result) {
                 try {
-                    deleteCache(CropActivity.this);
-                    File photoFile = createNewTempFile(CropActivity.this, "CROPPED", ".png");
+                    File photoFile = createNewCacheFile(CropActivity.this, "CROPPED", ".png");
                     Uri fileUri = FileProvider.getUriForFile(getApplicationContext(), SHARED_PROVIDER_AUTHORITY, photoFile);
                     saveBitmapToFile(photoFile, getResizedBitmap(result.getBitmap(),850));
-                    SendPhotoToAPI.sendPhoto(CropActivity.this, fileUri);
+                    Intent returnIntent = new Intent();
+                    returnIntent.putExtra(PHOTO_URI_KEY,fileUri.toString());
+                    setResult(RESULT_OK,returnIntent);
+                    finish();
                 } catch (IOException e) {
-                    toggleProgressBar(CropActivity.this, mProgressBar);
-                    deleteCache(CropActivity.this);
                     Toast.makeText(CropActivity.this, R.string.toast_crop_error, Toast.LENGTH_LONG).show();
                     Log.e(TAG, "Failed to save cropped bitmap");
                     e.printStackTrace();

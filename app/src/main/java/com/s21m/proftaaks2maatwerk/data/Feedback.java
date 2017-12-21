@@ -1,18 +1,18 @@
 package com.s21m.proftaaks2maatwerk.data;
 
 
-public class FeedbackData {
-    private ResultData mOriginalResult;
+public class Feedback {
+    private PhotoResult mOriginalResult;
     private int mCorrectedAge;
     private String mCorrectedEmotion;
 
-    public FeedbackData(ResultData originalResult, int correctedAge, String correctedEmotion){
+    public Feedback(PhotoResult originalResult, int correctedAge, String correctedEmotion){
         mOriginalResult = originalResult;
         mCorrectedAge = correctedAge;
         mCorrectedEmotion = correctedEmotion;
     }
 
-    public ResultData getmOriginalResult() {
+    public PhotoResult getmOriginalResult() {
         return mOriginalResult;
     }
 

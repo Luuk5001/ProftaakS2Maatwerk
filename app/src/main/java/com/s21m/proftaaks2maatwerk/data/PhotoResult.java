@@ -1,30 +1,22 @@
 package com.s21m.proftaaks2maatwerk.data;
 
-import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class ResultData implements Parcelable {
+public class PhotoResult implements Parcelable {
 
-    private Uri mPictureUri;
     private int mAge;
     private String mEmotion;
 
-    public ResultData(Uri pictureUri, int age, String emotion)
+    public PhotoResult(int age, String emotion)
     {
-        this.mPictureUri = pictureUri;
         this.mAge = age;
         this.mEmotion = emotion;
     }
 
-    protected ResultData(Parcel in) {
-        mPictureUri = Uri.parse(in.readString());
+    private PhotoResult(Parcel in) {
         mAge = in.readInt();
         mEmotion = in.readString();
-    }
-
-    public Uri getPictureUri() {
-        return mPictureUri;
     }
 
     public int getAge() {
@@ -42,20 +34,19 @@ public class ResultData implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(mPictureUri.toString());
         parcel.writeInt(mAge);
         parcel.writeString(mEmotion);
     }
 
-    public static final Creator<ResultData> CREATOR = new Creator<ResultData>() {
+    public static final Creator<PhotoResult> CREATOR = new Creator<PhotoResult>() {
         @Override
-        public ResultData createFromParcel(Parcel in) {
-            return new ResultData(in);
+        public PhotoResult createFromParcel(Parcel in) {
+            return new PhotoResult(in);
         }
 
         @Override
-        public ResultData[] newArray(int size) {
-            return new ResultData[size];
+        public PhotoResult[] newArray(int size) {
+            return new PhotoResult[size];
         }
     };
 
