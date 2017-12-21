@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
                     startCropPhotoActivity(imageUri);
                 }
                 else if(resultCode == RESULT_CAMERA_UNAVAILABLE){
-                    Toast.makeText(this, "The photo camera on this device is either unavailable or unsupported.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, R.string.toast_camera_unavailable, Toast.LENGTH_LONG).show();
                 }
                 break;
 
@@ -170,7 +170,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
         }
-        grantResults = null;
     }
 
     private void startCropPhotoActivity(Uri imageUri) {

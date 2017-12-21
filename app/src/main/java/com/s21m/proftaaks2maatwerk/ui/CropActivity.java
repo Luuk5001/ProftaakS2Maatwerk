@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.s21m.proftaaks2maatwerk.R;
 import com.s21m.proftaaks2maatwerk.SendPhotoToAPI;
@@ -24,6 +25,8 @@ import static com.s21m.proftaaks2maatwerk.Utilities.PHOTO_URI_KEY;
 import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_RETAKE;
 import static com.s21m.proftaaks2maatwerk.Utilities.SHARED_PROVIDER_AUTHORITY;
 import static com.s21m.proftaaks2maatwerk.Utilities.createNewTempFile;
+import static com.s21m.proftaaks2maatwerk.Utilities.deleteCache;
+import static com.s21m.proftaaks2maatwerk.Utilities.getResizedBitmap;
 import static com.s21m.proftaaks2maatwerk.Utilities.saveBitmapToFile;
 import static com.s21m.proftaaks2maatwerk.Utilities.toggleProgressBar;
 
@@ -44,35 +47,34 @@ public class CropActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         Uri photoUri = Uri.parse(intent.getStringExtra(PHOTO_URI_KEY));
+        mCropImageView.setAspectRatio(1,1);
+        mCropImageView.setFixedAspectRatio(true);
         mCropImageView.setImageUriAsync(photoUri);
     }
 
     @OnClick(R.id.buttonCropImage)
     public void onClickButtonCropImage(){
         toggleProgressBar(this, mProgressBar);
-        try{
-            final File photoFile = createNewTempFile(CropActivity.this, "CROPPED", ".png");
-            final Uri fileUri = FileProvider.getUriForFile(getApplicationContext(), SHARED_PROVIDER_AUTHORITY, photoFile);
-            mCropImageView.setOnCropImageCompleteListener(new CropImageView.OnCropImageCompleteListener() {
-                @Override
-                public void onCropImageComplete(CropImageView view, CropImageView.CropResult result) {
-                    try {
-                        saveBitmapToFile(photoFile, result.getBitmap());
-                        SendPhotoToAPI.sendPhoto(CropActivity.this, fileUri);
-                    } catch (IOException e) {
-                        toggleProgressBar(CropActivity.this, mProgressBar);
-                        Log.e(TAG, "Failed to save cropped bitmap");
-                        e.printStackTrace();
-                        finish();
-                    }
+        mCropImageView.setOnCropImageCompleteListener(new CropImageView.OnCropImageCompleteListener() {
+            @Override
+            public void onCropImageComplete(CropImageView view, CropImageView.CropResult result) {
+                try {
+                    deleteCache(CropActivity.this);
+                    File photoFile = createNewTempFile(CropActivity.this, "CROPPED", ".png");
+                    Uri fileUri = FileProvider.getUriForFile(getApplicationContext(), SHARED_PROVIDER_AUTHORITY, photoFile);
+                    saveBitmapToFile(photoFile, getResizedBitmap(result.getBitmap(),850));
+                    SendPhotoToAPI.sendPhoto(CropActivity.this, fileUri);
+                } catch (IOException e) {
+                    toggleProgressBar(CropActivity.this, mProgressBar);
+                    deleteCache(CropActivity.this);
+                    Toast.makeText(CropActivity.this, R.string.toast_crop_error, Toast.LENGTH_LONG).show();
+                    Log.e(TAG, "Failed to save cropped bitmap");
+                    e.printStackTrace();
+                    finish();
                 }
-            });
-            mCropImageView.getCroppedImageAsync();
-        }
-       catch (IOException e){
-            toggleProgressBar(this, mProgressBar);
-            e.printStackTrace();
-       }
+            }
+        });
+        mCropImageView.getCroppedImageAsync();
     }
 
     @OnClick(R.id.buttonRetakePhoto)

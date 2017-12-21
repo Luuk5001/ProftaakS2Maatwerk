@@ -78,7 +78,7 @@ public class PictureTakenActivity extends AppCompatActivity {
                 shareIntent.setAction(Intent.ACTION_SEND);
                 shareIntent.putExtra(Intent.EXTRA_STREAM, mResult.getPictureUri());
                 shareIntent.setType("image/png");
-                startActivity(Intent.createChooser(shareIntent, "Share image to..."));
+                startActivity(Intent.createChooser(shareIntent, getString(R.string.share_image_title)));
                 break;
         }
         return super.onOptionsItemSelected(item);

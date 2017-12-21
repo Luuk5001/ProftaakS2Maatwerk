@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feedback_submit_button">Verstuur</string>
+    <string name="feedback_emotion_label">Was jou emotie goed geraden? Zo niet, kies hier de correcte.</string>
+    <string name="feedback_age_label">Was jou leeftijd goed geraden? Zo niet, vul de juiste leeftijd in.</string>
+    <string name="feedback_title">Feedback</string>
+    <string name="share_button_title">Delen</string>
+    <string name="back_to_camera_button">Naar camera</string>
+    <string name="crop_and_submit_button">Voltooien</string>
+    <string name="toggle_flash_button_description">Flitserstand wisselen</string>
+    <string name="switch_lens_button_description">Lens wisselen</string>
+    <string name="take_picture_button">Neem foto</string>
+    <string name="toast_network_unavailable">Geen netwerk beschikbaar</string>
+    <string name="toast_camera_unavailable">De camera op dit apparaat is niet beschikbaar</string>
+    <string name="toast_error">Error</string>
+    <string name="toast_feedback_unavailable">Feedback momenteel niet beschikbaar</string>
+    <string name="share_image_title">Deel foto met&#8230;</string>
+    <string name="main_open_gallery_button">Open gallerij</string>
+    <string name="main_take_picture_button">Open camera</string>
+    <string name="last_picture_content_description">Laaste foto die met deze app is genomen</string>
+    <string name="taken_send_feedback_button">Verstuur</string>
+    <string name="taken_save_picture_button">Opslaan</string>
+    <string name="taken_picture">Foto die je zojuist hebt genomen</string>
+    <string name="send_photo_failure">Fout bij het verzenden van de foto</string>
+    <string name="toast_crop_error">Fout bij het croppen van de foto</string>
+</resources>

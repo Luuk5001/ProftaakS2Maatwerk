@@ -1,13 +1,27 @@
 <resources>
+    <string name="api_url">http://i359079.venus.fhict.nl/api/Classifier</string>
     <string name="app_name">ProftaakS2Maatwerk</string>
-    <string name="feedback_submit_button">SUBMIT</string>
-    <string name="feedback_emotion_label">Was your emotional state guessed correctly? If not, pick one that best describes it.</string>
+    <string name="feedback_submit_button">Submit</string>
+    <string name="feedback_emotion_label">Was your emotional state guessed correctly? If not, pick the correct one.</string>
     <string name="feedback_age_label">Was your age guessed correctly? If not, specify the correct age.</string>
-    <string name="feedback_title">Feedback on your result</string>
+    <string name="feedback_title">Feedback</string>
     <string name="share_button_title">Share</string>
     <string name="back_to_camera_button">Go to camera</string>
-    <string name="crop_and_submit_button">CROP AND SUBMIT</string>
+    <string name="crop_and_submit_button">Crop and submit</string>
     <string name="toggle_flash_button_description">Toggle Flash</string>
     <string name="switch_lens_button_description">Switch lens</string>
-    <string name="take_picture_button">TAKE PICTURE</string>
+    <string name="take_picture_button">Take picture</string>
+    <string name="toast_network_unavailable">Network unavailable</string>
+    <string name="toast_camera_unavailable">The photo camera on this device is either unavailable or unsupported.</string>
+    <string name="toast_error">An error occurred</string>
+    <string name="toast_feedback_unavailable">Feedback not available at this time</string>
+    <string name="share_image_title">Share image to&#8230;</string>
+    <string name="main_open_gallery_button">Open gallery</string>
+    <string name="main_take_picture_button">Open camera</string>
+    <string name="last_picture_content_description">Last picture taken with this app</string>
+    <string name="taken_send_feedback_button">Send</string>
+    <string name="taken_save_picture_button">Save</string>
+    <string name="taken_picture">Picture you just took</string>
+    <string name="send_photo_failure">Failed to send photo</string>
+    <string name="toast_crop_error">Error while cropping image</string>
 </resources>

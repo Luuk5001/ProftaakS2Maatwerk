@@ -1,7 +1,9 @@
 package com.s21m.proftaaks2maatwerk.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -59,7 +61,7 @@ public class FeedbackActivity extends AppCompatActivity {
         mResultData = intent.getParcelableExtra(RESULT_DATA_KEY);
 
         if(mResultData == null){
-            Toast.makeText(getApplicationContext(), "An error occurred", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), R.string.toast_error, Toast.LENGTH_LONG).show();
             Log.e(TAG, "Result data is null, closing activity");
             finish();
         }
@@ -112,14 +114,14 @@ public class FeedbackActivity extends AppCompatActivity {
 
             toggleProgressBar(this, progressBar);
 
-            String apiUrl = "http://i359079.venus.fhict.nl/api/Classifier";
+            String apiUrl = this.getString(R.string.api_url);
 
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder().url(apiUrl).build();
             Call call = client.newCall(request);
             call.enqueue(new Callback() {
                 @Override
-                public void onFailure(Call call, IOException e) {
+                public void onFailure(@NonNull Call call, @NonNull IOException e) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -130,14 +132,14 @@ public class FeedbackActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(getApplicationContext(), "Feedback not available at this time", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), R.string.toast_feedback_unavailable, Toast.LENGTH_LONG).show();
                             finish();
                         }
                     });
                 }
 
                 @Override
-                public void onResponse(Call call, Response response) throws IOException {
+                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -166,7 +168,7 @@ public class FeedbackActivity extends AppCompatActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Toast.makeText(getApplicationContext(), "Feedback not available at this time", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getApplicationContext(), R.string.toast_feedback_unavailable, Toast.LENGTH_LONG).show();
                                     finish();
                                 }
                             });
@@ -177,7 +179,7 @@ public class FeedbackActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(getApplicationContext(), "Feedback not available at this time", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), R.string.toast_feedback_unavailable, Toast.LENGTH_LONG).show();
                                 finish();
                             }
                         });
@@ -186,7 +188,7 @@ public class FeedbackActivity extends AppCompatActivity {
             });
         }
         else{
-            Toast.makeText(getApplicationContext(), "Feedback not available at this time", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), R.string.toast_feedback_unavailable, Toast.LENGTH_LONG).show();
             finish();
         }
     }

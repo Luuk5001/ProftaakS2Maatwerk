@@ -39,7 +39,6 @@ import static io.fotoapparat.parameter.selector.FlashSelectors.on;
 import static io.fotoapparat.parameter.selector.LensPositionSelectors.back;
 import static io.fotoapparat.parameter.selector.LensPositionSelectors.front;
 import static io.fotoapparat.parameter.selector.SizeSelectors.biggestSize;
-import static io.fotoapparat.parameter.selector.SizeSelectors.smallestSize;
 
 public class CameraActivity extends AppCompatActivity {
 
@@ -52,10 +51,8 @@ public class CameraActivity extends AppCompatActivity {
     private Fotoapparat mFotoapparat;
     private int mCurrentLensPosition = FRONT_LENS;
     private byte mCurrentFlashMode = FLASH_AUTO;
-    private CapabilitiesResult mCapabilities;
     private boolean mFrontLensAvailable = false;
     private boolean mBackLensAvailable = false;
-    private Size mPhotoSize;
 
     @BindView(R.id.cameraView)
     CameraView mCameraView;
@@ -67,6 +64,9 @@ public class CameraActivity extends AppCompatActivity {
     Button mButtonTakePicture;
     @BindView(R.id.progressBarCamera)
     ProgressBar mProgressBar;
+
+    public CameraActivity() {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -3,8 +3,11 @@ package com.s21m.proftaaks2maatwerk;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -17,6 +20,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,29 +38,39 @@ import okhttp3.ResponseBody;
 
 import static com.s21m.proftaaks2maatwerk.Utilities.RESULT_DATA_KEY;
 import static com.s21m.proftaaks2maatwerk.Utilities.createNewTempFile;
+import static com.s21m.proftaaks2maatwerk.Utilities.deleteCache;
+import static com.s21m.proftaaks2maatwerk.Utilities.getResizedBitmap;
+import static com.s21m.proftaaks2maatwerk.Utilities.saveBitmapToFile;
 import static com.s21m.proftaaks2maatwerk.Utilities.toggleProgressBar;
 
 public final class SendPhotoToAPI {
 
+    private static final String TAG = SendPhotoToAPI.class.getSimpleName();
+
     public static void sendPhoto(final Context context, final Uri imageUri){
         if(Utilities.isNetworkAvailable(context)){
 
-            String apiUrl = "http://i359079.venus.fhict.nl/api/Classifier";
+            String apiUrl = context.getString(R.string.api_url);
+
             File img = null;
+
             try {
-                img = getTempToSendFile(imageUri, context);
+                Bitmap imgBitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri);
+                imgBitmap = getResizedBitmap(imgBitmap, 64);
+                img = createNewTempFile(context, "toSend", ".png");
+                saveBitmapToFile(img, imgBitmap);
             } catch (IOException e) {
                 e.printStackTrace();
-                ((Activity)context).finish();
             }
 
-            RequestBody body = new MultipartBody.Builder()
+            assert img != null;
+            final RequestBody body = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
                     .addFormDataPart("pic", "pic.png",
                             RequestBody.create(MediaType.parse("image/png"), img))
                     .build();
 
-            Request request = new Request.Builder()
+            final Request request = new Request.Builder()
                     .url(apiUrl)
                     .post(body)
                     .build();
@@ -67,8 +81,15 @@ public final class SendPhotoToAPI {
                 @Override
                 public void onFailure(@NonNull Call call, @NonNull IOException e) {
                     e.printStackTrace();
+                    ((Activity)context).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            deleteCache(context);
+                            Toast.makeText(context, R.string.send_photo_failure, Toast.LENGTH_LONG).show();
+                        }
+                    });
+                    ((Activity)context).finish();
                 }
-
                 @Override
                 public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                     try{
@@ -84,23 +105,21 @@ public final class SendPhotoToAPI {
                     }
                     catch (Exception e){
                         e.printStackTrace();
+                        ((Activity)context).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                deleteCache(context);
+                                Toast.makeText(context, R.string.send_photo_failure, Toast.LENGTH_LONG).show();
+                            }
+                        });
+                        ((Activity)context).finish();
                     }
                 }
             });
         }
         else{
-            Toast.makeText(context, "Network unavailable", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, R.string.toast_network_unavailable, Toast.LENGTH_SHORT).show();
         }
-    }
-
-    private static File getTempToSendFile(Uri imageUri, Context context) throws IOException {
-        InputStream inputStream = context.getContentResolver().openInputStream(imageUri);
-        byte[] buffer = new byte[inputStream.available()];
-        inputStream.read(buffer);
-        File tempFile = createNewTempFile(context, "toSend", ".png");
-        OutputStream outStream = new FileOutputStream(tempFile);
-        outStream.write(buffer);
-        return tempFile;
     }
 
     private static ResultData parseResult(String jsonData, Uri imageUri) throws JSONException, IllegalArgumentException {
