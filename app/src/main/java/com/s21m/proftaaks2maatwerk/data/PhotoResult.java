@@ -1,12 +1,15 @@
 package com.s21m.proftaaks2maatwerk.data;
 
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 public class PhotoResult implements Parcelable {
 
-    private int mAge;
-    private String mEmotion;
+    public static final String PHOTO_RESULT_DATA_KEY = "photo_result";
+
+    private final int mAge;
+    private final String mEmotion;
 
     public PhotoResult(int age, String emotion)
     {

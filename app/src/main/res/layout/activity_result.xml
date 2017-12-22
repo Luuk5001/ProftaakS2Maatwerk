@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_gradient"
-    tools:context="com.s21m.proftaaks2maatwerk.ui.PictureTakenActivity">
+    tools:context="com.s21m.proftaaks2maatwerk.ui.ResultActivity">
 
     <Button
         android:id="@+id/buttonSavePicture"

@@ -1,6 +1,8 @@
 <resources>
-    <string name="api_url">http://i359079.venus.fhict.nl/api/Classifier</string>
-    <string name="app_name">ProftaakS2Maatwerk</string>
+    <string name="api_url" translatable="false">http://i359079.venus.fhict.nl/api/Classifier</string>
+    <string name="app_name" translatable="false">ProftaakS2Maatwerk</string>
+    <string name="shared_directory_name" translatable="false">Proftaak S2M photos</string>
+
     <string name="feedback_submit_button">Submit</string>
     <string name="feedback_emotion_label">Was your emotional state guessed correctly? If not, pick the correct one.</string>
     <string name="feedback_age_label">Was your age guessed correctly? If not, specify the correct age.</string>
@@ -22,8 +24,9 @@
     <string name="taken_send_feedback_button">Send feedback</string>
     <string name="taken_save_picture_button">Save to gallery</string>
     <string name="taken_picture">Picture you just took</string>
-    <string name="send_photo_failure">Failed to send photo</string>
     <string name="toast_crop_error">Error while cropping image</string>
     <string name="result_image_age_suffix">years old</string>
     <string name="result_image_bottom_bar_text">Proftaak S2M project</string>
+    <string name="toast_save_photo_to_gallery_error">Could not save the photo</string>
+    <string name="toast_save_photo_to_gallery_success">Photo has been saved to gallery</string>
 </resources>

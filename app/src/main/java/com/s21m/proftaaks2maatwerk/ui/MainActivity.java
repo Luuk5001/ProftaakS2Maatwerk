@@ -26,18 +26,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static com.s21m.proftaaks2maatwerk.utils.Utils.PHOTO_URI_KEY;
-import static com.s21m.proftaaks2maatwerk.utils.Utils.REQUEST_CAMERA;
-import static com.s21m.proftaaks2maatwerk.utils.Utils.REQUEST_CAMERA_PERMISSION;
-import static com.s21m.proftaaks2maatwerk.utils.Utils.REQUEST_CROP;
-import static com.s21m.proftaaks2maatwerk.utils.Utils.REQUEST_GALLERY;
-import static com.s21m.proftaaks2maatwerk.utils.Utils.REQUEST_STORAGE_PERMISSION;
-import static com.s21m.proftaaks2maatwerk.utils.Utils.RESULT_CAMERA_UNAVAILABLE;
-
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     public static final String LAST_PICTURE_NAME = "lastPicture.png";
+    public static final byte REQUEST_GALLERY = 41;
+    public static final byte REQUEST_STORAGE_PERMISSION = 48;
 
     @BindView(R.id.imageViewLastPicture)
     ImageView imageViewLastPicture;
@@ -78,11 +72,11 @@ public class MainActivity extends AppCompatActivity {
     {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case REQUEST_CAMERA:
+            case CameraActivity.REQUEST_CAMERA:
                 if(resultCode == RESULT_OK){
-                    startCropPhotoActivity(Uri.parse(data.getStringExtra(PHOTO_URI_KEY)));
+                    startCropPhotoActivity(Uri.parse(data.getStringExtra(CameraActivity.PHOTO_URI_KEY)));
                 }
-                else if(resultCode == RESULT_CAMERA_UNAVAILABLE){
+                else if(resultCode == CameraActivity.RESULT_CAMERA_UNAVAILABLE){
                     Toast.makeText(this, R.string.toast_camera_unavailable, Toast.LENGTH_LONG).show();
                 }
                 break;
@@ -91,9 +85,9 @@ public class MainActivity extends AppCompatActivity {
                     startCropPhotoActivity(data.getData());
                 }
                 break;
-            case REQUEST_CROP:
+            case CropActivity.REQUEST_CROP:
                 if(resultCode == RESULT_OK){
-                    startPictureTakenActivity(Uri.parse(data.getStringExtra(PHOTO_URI_KEY)));
+                    startResultActivity(Uri.parse(data.getStringExtra(CropActivity.PHOTO_URI_KEY)));
                 }
                 break;
         }
@@ -103,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode){
-            case REQUEST_CAMERA_PERMISSION:
+            case CameraActivity.REQUEST_CAMERA_PERMISSION:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     startCameraActivity();
                 }
@@ -134,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
             }
             else{
                 ActivityCompat.requestPermissions(MainActivity.this,
-                        new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+                        new String[]{Manifest.permission.CAMERA}, CameraActivity.REQUEST_CAMERA_PERMISSION);
             }
         }
         else{
@@ -149,20 +143,20 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, REQUEST_GALLERY);
     }
 
-    private void startPictureTakenActivity(Uri imageUri){
-        Intent intent = new Intent(this, PictureTakenActivity.class);
-        intent.putExtra(PHOTO_URI_KEY ,String.valueOf(imageUri));
+    private void startResultActivity(Uri imageUri){
+        Intent intent = new Intent(this, ResultActivity.class);
+        intent.putExtra(ResultActivity.PHOTO_URI_KEY ,String.valueOf(imageUri));
         startActivity(intent);
     }
 
     private void startCropPhotoActivity(Uri imageUri) {
         Intent intent = new Intent(this, CropActivity.class);
-        intent.putExtra(PHOTO_URI_KEY ,String.valueOf(imageUri));
-        startActivityForResult(intent, REQUEST_CROP);
+        intent.putExtra(CropActivity.PHOTO_URI_KEY ,String.valueOf(imageUri));
+        startActivityForResult(intent, CropActivity.REQUEST_CROP);
     }
 
     private void startCameraActivity(){
         Intent intent = new Intent(this, CameraActivity.class);
-        startActivityForResult(intent, REQUEST_CAMERA);
+        startActivityForResult(intent, CameraActivity.REQUEST_CAMERA);
     }
 }

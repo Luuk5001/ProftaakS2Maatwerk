@@ -2,9 +2,9 @@ package com.s21m.proftaaks2maatwerk.data;
 
 
 public class Feedback {
-    private PhotoResult mOriginalResult;
-    private int mCorrectedAge;
-    private String mCorrectedEmotion;
+    private final PhotoResult mOriginalResult;
+    private final int mCorrectedAge;
+    private final String mCorrectedEmotion;
 
     public Feedback(PhotoResult originalResult, int correctedAge, String correctedEmotion){
         mOriginalResult = originalResult;

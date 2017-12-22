@@ -5,5 +5,5 @@
     <color name="colorAccent">#ff920a</color>
     <color name="colorBottomBarResultPicture">#d9ff920a</color>
     <color name="colorPrimaryDarkTranslucent">#CC024DE2</color>
-    <color name="colorDisabled">#7A7A7A</color>
+    <color name="dimGray">#696969</color>
 </resources>

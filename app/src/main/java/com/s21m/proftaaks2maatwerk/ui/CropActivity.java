@@ -11,6 +11,8 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.s21m.proftaaks2maatwerk.R;
+import com.s21m.proftaaks2maatwerk.extensions.Application;
+import com.s21m.proftaaks2maatwerk.extensions.Bitmap;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
@@ -20,16 +22,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static com.s21m.proftaaks2maatwerk.utils.Utils.PHOTO_URI_KEY;
-import static com.s21m.proftaaks2maatwerk.utils.Utils.RESULT_RETAKE;
-import static com.s21m.proftaaks2maatwerk.utils.Utils.SHARED_PROVIDER_AUTHORITY;
-import static com.s21m.proftaaks2maatwerk.utils.Utils.createNewCacheFile;
-import static com.s21m.proftaaks2maatwerk.utils.Utils.getResizedBitmap;
-import static com.s21m.proftaaks2maatwerk.utils.Utils.saveBitmapToFile;
-
 public class CropActivity extends AppCompatActivity {
 
-    private static String TAG = CropActivity.class.getSimpleName();
+    public static final byte REQUEST_CROP = 42;
+    public static final String PHOTO_URI_KEY = "crop_photo_uri";
+
+    private static final String TAG = CropActivity.class.getSimpleName();
 
     @BindView(R.id.cropImageView)
     CropImageView mCropImageView;
@@ -55,9 +53,11 @@ public class CropActivity extends AppCompatActivity {
             @Override
             public void onCropImageComplete(CropImageView view, CropImageView.CropResult result) {
                 try {
-                    File photoFile = createNewCacheFile(CropActivity.this, "CROPPED", ".png");
-                    Uri fileUri = FileProvider.getUriForFile(getApplicationContext(), SHARED_PROVIDER_AUTHORITY, photoFile);
-                    saveBitmapToFile(photoFile, getResizedBitmap(result.getBitmap(),850));
+                    File photoFile = File.createTempFile("CROPPED", ".png", CropActivity.this.getCacheDir());
+                    Uri fileUri = FileProvider.getUriForFile(getApplicationContext(), Application.SHARED_PROVIDER_AUTHORITY, photoFile);
+                    Bitmap bitmap = new Bitmap(result.getBitmap());
+                    bitmap.resize(850);
+                    bitmap.saveToFile(photoFile);
                     Intent returnIntent = new Intent();
                     returnIntent.putExtra(PHOTO_URI_KEY,fileUri.toString());
                     setResult(RESULT_OK,returnIntent);
@@ -75,7 +75,7 @@ public class CropActivity extends AppCompatActivity {
 
     @OnClick(R.id.buttonRetakePhoto)
     public void onClickButtonRetakePhoto(View view){
-        setResult(RESULT_RETAKE);
+        setResult(CameraActivity.RESULT_RETAKE);
         finish();
     }
 }

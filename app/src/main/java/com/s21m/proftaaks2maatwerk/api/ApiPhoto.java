@@ -3,14 +3,14 @@ package com.s21m.proftaaks2maatwerk.api;
 import android.accounts.NetworkErrorException;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 
 import com.s21m.proftaaks2maatwerk.R;
 import com.s21m.proftaaks2maatwerk.data.PhotoResult;
-import com.s21m.proftaaks2maatwerk.utils.Utils;
+import com.s21m.proftaaks2maatwerk.extensions.Application;
+import com.s21m.proftaaks2maatwerk.extensions.Bitmap;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,10 +27,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-
-import static com.s21m.proftaaks2maatwerk.utils.Utils.createNewCacheFile;
-import static com.s21m.proftaaks2maatwerk.utils.Utils.getResizedBitmap;
-import static com.s21m.proftaaks2maatwerk.utils.Utils.saveBitmapToFile;
 
 public final class ApiPhoto {
 
@@ -50,9 +46,9 @@ public final class ApiPhoto {
         return apiPhotoInstance == null ? new ApiPhoto() : apiPhotoInstance;
     }
 
-    public<T extends Context & ApiListener> void send(Uri imageUri, T context) throws NetworkErrorException, IOException {
-        if (Utils.isNetworkAvailable(context)) {
-            File imageFile = getImageFileToSend(imageUri, context);
+    public<T extends Context & ApiListener<PhotoResult>> void send(Uri imageUri, T context) throws NetworkErrorException, IOException {
+        if (((Application)context.getApplicationContext()).isNetworkAvailable()) {
+            File imageFile = getFileToSend(imageUri, context);
 
             final RequestBody body = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
@@ -74,14 +70,11 @@ public final class ApiPhoto {
         }
     }
 
-    private File getImageFileToSend(Uri imageUri, Context context) throws IOException {
-        Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri);
-        bitmap = getResizedBitmap(bitmap, FILE_RESOLUTION);
-
-        File imageFile = createNewCacheFile(context, "toSend", ".png");
-
-        saveBitmapToFile(imageFile, bitmap);
-
+    private File getFileToSend(Uri imageUri, Context context) throws IOException {
+        Bitmap bitmap = new Bitmap(MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri));
+        bitmap.resize(FILE_RESOLUTION);
+        File imageFile = File.createTempFile("toSend", ".png", context.getCacheDir());
+        bitmap.saveToFile(imageFile);
         return  imageFile;
     }
 
@@ -99,7 +92,7 @@ public final class ApiPhoto {
                 ((Activity)context).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        context.sendPhotoFailure(e);
+                        context.onFailure(e);
                     }
                 });
             }
@@ -113,10 +106,10 @@ public final class ApiPhoto {
                             ResponseBody body = response.body();
                             String jsonData = body != null ? body.string() : null;
                             PhotoResult result = parseResult(jsonData);
-                            context.sendPhotoSuccess(result);
+                            context.onSuccess(result);
                         }
                         catch (Exception e) {
-                            context.sendPhotoFailure(e);
+                            context.onFailure(e);
                         }
                     }
                 });

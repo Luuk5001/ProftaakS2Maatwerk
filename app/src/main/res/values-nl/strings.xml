@@ -19,10 +19,11 @@
     <string name="main_take_picture_button">Open camera</string>
     <string name="last_picture_content_description">Laaste foto die met deze app is genomen</string>
     <string name="taken_send_feedback_button">Geef feedback</string>
-    <string name="taken_save_picture_button">Opslaan i ngallerij</string>
+    <string name="taken_save_picture_button">Opslaan in gallerij</string>
     <string name="taken_picture">Foto die je zojuist hebt genomen</string>
-    <string name="send_photo_failure">Fout bij het verzenden van de foto</string>
-    <string name="toast_crop_error">Fout bij het croppen van de foto</string>
+    <string name="toast_crop_error">Fout bij het bijsnijden van de foto</string>
     <string name="result_image_age_suffix">years old</string>
     <string name="result_image_bottom_bar_text">Proftaak S2M project</string>
+    <string name="toast_save_photo_to_gallery_error">Fout bij het opslaan van de foto</string>
+    <string name="toast_save_photo_to_gallery_success">Foto is opgeslagen in gallerij</string>
 </resources>

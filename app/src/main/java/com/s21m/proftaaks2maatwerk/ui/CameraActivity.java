@@ -13,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 
 import com.s21m.proftaaks2maatwerk.R;
+import com.s21m.proftaaks2maatwerk.extensions.Application;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,10 +27,6 @@ import io.fotoapparat.result.PendingResult;
 import io.fotoapparat.result.PhotoResult;
 import io.fotoapparat.view.CameraView;
 
-import static com.s21m.proftaaks2maatwerk.utils.Utils.PHOTO_URI_KEY;
-import static com.s21m.proftaaks2maatwerk.utils.Utils.RESULT_CAMERA_UNAVAILABLE;
-import static com.s21m.proftaaks2maatwerk.utils.Utils.SHARED_PROVIDER_AUTHORITY;
-import static com.s21m.proftaaks2maatwerk.utils.Utils.createNewCacheFile;
 import static io.fotoapparat.parameter.selector.FlashSelectors.autoFlash;
 import static io.fotoapparat.parameter.selector.FlashSelectors.off;
 import static io.fotoapparat.parameter.selector.FlashSelectors.on;
@@ -37,7 +34,13 @@ import static io.fotoapparat.parameter.selector.LensPositionSelectors.back;
 import static io.fotoapparat.parameter.selector.LensPositionSelectors.front;
 import static io.fotoapparat.parameter.selector.SizeSelectors.biggestSize;
 
-public class CameraActivity extends AppCompatActivity {
+public class CameraActivity extends AppCompatActivity implements PendingResult.Callback<Void> {
+
+    public static final int REQUEST_CAMERA = 10;
+    public static final byte REQUEST_CAMERA_PERMISSION = 51;
+    public static final String PHOTO_URI_KEY = "camera_photo_uri";
+    public static final byte RESULT_RETAKE = 52;
+    public static final byte RESULT_CAMERA_UNAVAILABLE = 53;
 
     private static final byte FLASH_ON = 0;
     private static final byte FLASH_OFF = 1;
@@ -50,6 +53,7 @@ public class CameraActivity extends AppCompatActivity {
     private byte mCurrentFlashMode = FLASH_AUTO;
     private boolean mFrontLensAvailable = false;
     private boolean mBackLensAvailable = false;
+    private Uri photoUri;
 
     @BindView(R.id.cameraView)
     CameraView mCameraView;
@@ -96,21 +100,21 @@ public class CameraActivity extends AppCompatActivity {
         mFotoapparat.stop();
     }
 
+    @Override
+    public void onResult(Void aVoid) {
+        Intent data = new Intent();
+        data.putExtra(PHOTO_URI_KEY, String.valueOf(photoUri));
+        setResult(RESULT_OK, data);
+        finish();
+    }
+
     @OnClick(R.id.buttonTakePicture)
     public void onClickButtonTakePicture(View view) {
         try {
-            final File photoFile = createNewCacheFile(this, "NOCROP", null);
-            final Uri fileUri = FileProvider.getUriForFile(getApplicationContext(), SHARED_PROVIDER_AUTHORITY, photoFile);
+            File photoFile = File.createTempFile("noCrop", ".png", this.getCacheDir());
+            photoUri = FileProvider.getUriForFile(getApplicationContext(), Application.SHARED_PROVIDER_AUTHORITY, photoFile);
             PhotoResult photoResult = mFotoapparat.takePicture();
-            photoResult.saveToFile(photoFile).whenAvailable(new PendingResult.Callback<Void>() {
-                @Override
-                public void onResult(Void aVoid) {
-                    Intent data = new Intent();
-                    data.putExtra(PHOTO_URI_KEY, String.valueOf(fileUri));
-                    setResult(RESULT_OK, data);
-                    finish();
-                }
-            });
+            photoResult.saveToFile(photoFile).whenAvailable(this);
         }
         catch (IOException e){
             e.printStackTrace();
