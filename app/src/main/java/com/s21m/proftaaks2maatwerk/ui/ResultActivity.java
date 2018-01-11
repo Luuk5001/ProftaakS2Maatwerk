@@ -153,10 +153,15 @@ public class ResultActivity extends ProgressBarActivity implements ApiListener<P
     }
 
     @OnClick(R.id.buttonSendFeedback)
-    public void onButtonSendFeedbackClick(View view){
+    public void onClickButtonSendFeedback(View view){
         Intent intent = new Intent(this, FeedbackActivity.class);
         intent.putExtra(PhotoResult.PHOTO_RESULT_DATA_KEY, result);
         startActivity(intent);
+    }
+
+    @OnClick(R.id.buttonStartOver)
+    public void onClickButtonStartOver(View view){
+        finish();
     }
 
     //================================================================================
