@@ -12,8 +12,13 @@ import com.s21m.proftaaks2maatwerk.BuildConfig;
 import java.io.File;
 
 public class Application extends android.app.Application {
+
     public static final String SHARED_PROVIDER_AUTHORITY = BuildConfig.APPLICATION_ID + ".fileProvider";
 
+    /**
+     * Checks if network is available
+     * @return true if network is available, false if not
+     */
     public boolean isNetworkAvailable() {
         ConnectivityManager manager = (ConnectivityManager)
                 this.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -26,6 +31,10 @@ public class Application extends android.app.Application {
         return isAvailable;
     }
 
+    /**
+     * Updates the android gallery with the specified file
+     * @param file file to scan
+     */
     public void scanFile(File file){
         MediaScannerConnection.scanFile(this,
                 new String[] { file.toString() }, null,
@@ -35,5 +44,15 @@ public class Application extends android.app.Application {
                         Log.i("ExternalStorage", "-> uri=" + uri);
                     }
                 });
+    }
+
+    /**
+     * Get a string ID from string resources based on it's name
+     * @param context context
+     * @param name resource name
+     * @return resource ID
+     */
+    public static  int getStringIdentifier(Context context, String name) {
+        return context.getResources().getIdentifier(name, "string", context.getPackageName());
     }
 }

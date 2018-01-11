@@ -2,6 +2,7 @@ package com.s21m.proftaaks2maatwerk.data;
 
 
 public class Feedback {
+
     private final PhotoResult mOriginalResult;
     private final int mCorrectedAge;
     private final String mCorrectedEmotion;

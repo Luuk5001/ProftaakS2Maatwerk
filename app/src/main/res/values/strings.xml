@@ -1,5 +1,4 @@
 <resources>
-    <string name="api_url" translatable="false">http://i359079.venus.fhict.nl/api/Classifier</string>
     <string name="app_name" translatable="false">ProftaakS2Maatwerk</string>
     <string name="shared_directory_name" translatable="false">Proftaak S2M photos</string>
 
@@ -29,4 +28,8 @@
     <string name="result_image_bottom_bar_text">Proftaak S2M project</string>
     <string name="toast_save_photo_to_gallery_error">Could not save the photo</string>
     <string name="toast_save_photo_to_gallery_success">Photo has been saved to gallery</string>
+    <string name="Anger">Angry</string>
+    <string name="Sad">Sad</string>
+    <string name="Happy">Happy</string>
+    <string name="Disgust">Disgusted</string>
 </resources>

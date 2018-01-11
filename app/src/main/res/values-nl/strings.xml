@@ -26,4 +26,8 @@
     <string name="result_image_bottom_bar_text">Proftaak S2M project</string>
     <string name="toast_save_photo_to_gallery_error">Fout bij het opslaan van de foto</string>
     <string name="toast_save_photo_to_gallery_success">Foto is opgeslagen in gallerij</string>
+    <string name="Anger">Boos</string>
+    <string name="Sad">Droevig</string>
+    <string name="Happy">Blij</string>
+    <string name="Disgust">Walging</string>
 </resources>

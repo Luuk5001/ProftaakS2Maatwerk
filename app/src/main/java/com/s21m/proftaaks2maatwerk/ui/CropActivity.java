@@ -24,15 +24,18 @@ import butterknife.OnClick;
 
 public class CropActivity extends AppCompatActivity {
 
-    public static final byte REQUEST_CROP = 42;
-    public static final String PHOTO_URI_KEY = "crop_photo_uri";
-
     private static final String TAG = CropActivity.class.getSimpleName();
+    public static final String KEY_PHOTO_URI = "crop_photo_uri";
+    public static final int RESULT_CODE_RETAKE_PHOTO = 201;
 
     @BindView(R.id.cropImageView)
     CropImageView mCropImageView;
     @BindView(R.id.progressBarCrop)
     ProgressBar mProgressBar;
+
+    //================================================================================
+    // Activity overrides
+    //================================================================================
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +44,16 @@ public class CropActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         Intent intent = getIntent();
-        Uri photoUri = Uri.parse(intent.getStringExtra(PHOTO_URI_KEY));
+        Uri photoUri = Uri.parse(intent.getStringExtra(KEY_PHOTO_URI));
+        //Cropper settings
         mCropImageView.setAspectRatio(1,1);
         mCropImageView.setFixedAspectRatio(true);
         mCropImageView.setImageUriAsync(photoUri);
     }
+
+    //================================================================================
+    // OnClickEvents
+    //================================================================================
 
     @OnClick(R.id.buttonCropImage)
     public void onClickButtonCropImage(){
@@ -53,17 +61,18 @@ public class CropActivity extends AppCompatActivity {
             @Override
             public void onCropImageComplete(CropImageView view, CropImageView.CropResult result) {
                 try {
-                    File photoFile = File.createTempFile("CROPPED", ".png", CropActivity.this.getCacheDir());
+                    File photoFile = File.createTempFile("CROPPED", ".jpeg", CropActivity.this.getCacheDir());
                     Uri fileUri = FileProvider.getUriForFile(getApplicationContext(), Application.SHARED_PROVIDER_AUTHORITY, photoFile);
                     Bitmap bitmap = new Bitmap(result.getBitmap());
                     bitmap.resize(850);
                     bitmap.saveToFile(photoFile);
                     Intent returnIntent = new Intent();
-                    returnIntent.putExtra(PHOTO_URI_KEY,fileUri.toString());
+                    returnIntent.putExtra(KEY_PHOTO_URI,fileUri.toString());
                     setResult(RESULT_OK,returnIntent);
                     finish();
                 } catch (IOException e) {
                     Toast.makeText(CropActivity.this, R.string.toast_crop_error, Toast.LENGTH_LONG).show();
+                    setResult(RESULT_CANCELED);
                     Log.e(TAG, "Failed to save cropped bitmap");
                     e.printStackTrace();
                     finish();
@@ -75,7 +84,7 @@ public class CropActivity extends AppCompatActivity {
 
     @OnClick(R.id.buttonRetakePhoto)
     public void onClickButtonRetakePhoto(View view){
-        setResult(CameraActivity.RESULT_RETAKE);
+        setResult(RESULT_CODE_RETAKE_PHOTO);
         finish();
     }
 }

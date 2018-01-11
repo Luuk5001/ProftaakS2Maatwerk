@@ -10,6 +10,7 @@ import com.s21m.proftaaks2maatwerk.extensions.Application;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -35,10 +36,10 @@ public final class ApiEmotions {
     }
 
     public<T extends Context & ApiListener<String[]>> void request(T context) throws NetworkErrorException {
+
+        String apiUrl = "http://lucurlings.pythonanywhere.com/emotions";
+
         if (((Application) context.getApplicationContext()).isNetworkAvailable()) {
-
-            String apiUrl = context.getString(R.string.api_url);
-
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder().url(apiUrl).build();
             Call call = client.newCall(request);
@@ -50,7 +51,8 @@ public final class ApiEmotions {
     }
 
     private String[] parseResult(String jsonData) throws JSONException {
-        JSONArray jsonArray = new JSONArray(jsonData);
+        JSONObject data = new JSONObject(jsonData);
+        JSONArray jsonArray = data.getJSONArray("emotions");
         final String[] emotions = new String[jsonArray.length()];
         for (int i=0;i<jsonArray.length();i++){
             emotions[i] = jsonArray.get(i).toString();

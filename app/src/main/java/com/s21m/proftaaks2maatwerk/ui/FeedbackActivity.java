@@ -4,6 +4,7 @@ import android.accounts.NetworkErrorException;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
@@ -15,8 +16,7 @@ import com.s21m.proftaaks2maatwerk.api.ApiEmotions;
 import com.s21m.proftaaks2maatwerk.api.ApiListener;
 import com.s21m.proftaaks2maatwerk.data.Feedback;
 import com.s21m.proftaaks2maatwerk.data.PhotoResult;
-
-import java.util.Arrays;
+import com.s21m.proftaaks2maatwerk.extensions.Application;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,14 +26,17 @@ public class FeedbackActivity extends ProgressBarActivity implements ApiListener
 
     private static final String TAG = FeedbackActivity.class.getSimpleName();
 
-    private PhotoResult photoResult;
-
-    @BindView(R.id.spinnerAge)
-    Spinner mSpinnerAge;
     @BindView(R.id.spinnerEmotion)
-    Spinner mSpinnerEmotion;
+    Spinner emotionSpinner;
     @BindView(R.id.progressBarFeedback)
     ProgressBar progressBar;
+
+    private PhotoResult photoResult;
+    private SparseArray<String> emotionsSparseArray;
+
+    //================================================================================
+    // Activity overrides
+    //================================================================================
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,10 +44,10 @@ public class FeedbackActivity extends ProgressBarActivity implements ApiListener
         setContentView(R.layout.activity_feedback);
         ButterKnife.bind(this);
 
-        requestAvailableEmotions();
-
         Intent intent = getIntent();
         photoResult = intent.getParcelableExtra(PhotoResult.PHOTO_RESULT_DATA_KEY);
+
+        requestAvailableEmotions();
 
         if(photoResult == null){
             Toast.makeText(getApplicationContext(), R.string.toast_error, Toast.LENGTH_LONG).show();
@@ -53,23 +56,35 @@ public class FeedbackActivity extends ProgressBarActivity implements ApiListener
         }
     }
 
-    @OnClick(R.id.buttonSubmit)
-    public void onClickButtonSubmit(View view){
-        int age = (int)mSpinnerAge.getSelectedItem();
-        String emotion = (String)mSpinnerEmotion.getSelectedItem();
-
-        Feedback feedback = new Feedback(photoResult, age, emotion);
-
-        Toast.makeText(getApplicationContext(), feedback.toString(), Toast.LENGTH_LONG).show();
-        Log.i(TAG, "Feedback data sent:\n" + feedback.toString());
-
-        finish();
-    }
+    //================================================================================
+    // ApiListener overrides
+    //================================================================================
 
     @Override
     public void onSuccess(String[] result) {
         toggleProgressBar(progressBar);
-        updateUI(getAgeArray(), result);
+        emotionsSparseArray = new SparseArray<>();
+        String[] emotionsArray = new String[result.length];
+        String detectedEmotion = null;
+        for(int i = 0; i < result.length; i++){
+            int resId = Application.getStringIdentifier(this, result[i]);
+            emotionsSparseArray.put(i, result[i]);
+            //Check if the emotion has a corresponding resource, if so use this value
+            //as display value in the spinner
+            String emotionResource = (resId == 0) ? result[i] : getString(resId);
+            if(emotionResource == null) {
+                emotionsArray[i] = result[i];
+            }
+            else{
+                emotionsArray[i] = emotionResource;
+            }
+            //Check if the emotion from the list equals the detected emotion
+            //this emotion will be set al the selected one in the spinner.
+            if(result[i].equals(photoResult.getEmotion())){
+                detectedEmotion = emotionsArray[i];
+            }
+        }
+        updateUI(emotionsArray, detectedEmotion);
     }
 
     @Override
@@ -80,7 +95,27 @@ public class FeedbackActivity extends ProgressBarActivity implements ApiListener
         finish();
     }
 
-    private void requestAvailableEmotions(){
+    //================================================================================
+    // OnClickEvents
+    //================================================================================
+
+    @OnClick(R.id.buttonSubmit)
+    public void onClickButtonSubmit(View view) {
+        String emotion = emotionsSparseArray.get(emotionSpinner.getSelectedItemPosition());
+
+        Feedback feedback = new Feedback(photoResult, 0, emotion);
+
+        Toast.makeText(getApplicationContext(), feedback.toString(), Toast.LENGTH_LONG).show();
+        Log.i(TAG, "Feedback data sent:\n" + feedback.toString());
+
+        finish();
+    }
+
+    //================================================================================
+    // Methods
+    //================================================================================
+
+    private void requestAvailableEmotions() {
         toggleProgressBar(progressBar);
         try {
             ApiEmotions.getInstance().request(this);
@@ -92,24 +127,12 @@ public class FeedbackActivity extends ProgressBarActivity implements ApiListener
         }
     }
 
-    private void updateUI(Integer[] ages, String[] emotions) {
+    private void updateUI(String[] emotions, String detectedEmotion) {
         ArrayAdapter<String> emotionsArrayAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, emotions);
-        mSpinnerEmotion.setAdapter(emotionsArrayAdapter);
-        ArrayAdapter<Integer> ageArrayAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, ages);
-        mSpinnerAge.setAdapter(ageArrayAdapter);
-        int index = Arrays.asList(ages).indexOf(photoResult.getAge());
-        mSpinnerAge.setSelection(index);
-        if (photoResult.getEmotion() != null) {
-            int spinnerPosition = emotionsArrayAdapter.getPosition(photoResult.getEmotion());
-            mSpinnerEmotion.setSelection(spinnerPosition);
+        emotionSpinner.setAdapter(emotionsArrayAdapter);
+        if (detectedEmotion != null) {
+            int spinnerPosition = emotionsArrayAdapter.getPosition(detectedEmotion);
+            emotionSpinner.setSelection(spinnerPosition);
         }
-    }
-
-    private Integer[] getAgeArray(){
-        Integer[] age = new Integer[100];
-        for(int i = 0; i < 100; i++){
-            age[i] = i + 1;
-        }
-        return age;
     }
 }

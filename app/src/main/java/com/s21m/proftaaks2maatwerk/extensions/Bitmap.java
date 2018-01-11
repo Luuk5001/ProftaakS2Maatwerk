@@ -1,5 +1,7 @@
 package com.s21m.proftaaks2maatwerk.extensions;
 
+import android.util.Log;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -8,6 +10,8 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
 public class Bitmap {
+
+    private static final String TAG = Bitmap.class.getSimpleName();
 
     private android.graphics.Bitmap bitmap;
 
@@ -59,7 +63,9 @@ public class Bitmap {
         randomAccessFile.close();
 
         // delete the temp file
-        file.delete();
+        if(!file.delete()) {
+            Log.d(TAG, "Failed to delete temp bitmap file while create a mutable bitmap");
+        }
     }
 
     /**
@@ -92,7 +98,7 @@ public class Bitmap {
      */
     public void saveToFile(File file) throws IOException {
         FileOutputStream fOut = new FileOutputStream(file);
-        bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, fOut);
+        bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 100, fOut);
         fOut.flush();
         fOut.close();
     }

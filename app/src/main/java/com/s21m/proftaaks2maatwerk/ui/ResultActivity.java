@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,10 +41,8 @@ import butterknife.OnClick;
 
 public class ResultActivity extends ProgressBarActivity implements ApiListener<PhotoResult> {
 
+    public static final String TAG = ResultActivity.class.getSimpleName();
     public static String PHOTO_URI_KEY = "result_photo_uri";
-
-    private Uri photoUri;
-    private PhotoResult result;
 
     @BindView(R.id.imageViewPicture)
     ImageView imageViewPicture;
@@ -51,6 +50,13 @@ public class ResultActivity extends ProgressBarActivity implements ApiListener<P
     ProgressBar progressBar;
     @BindView(R.id.buttonSavePicture)
     Button buttonSavePicture;
+
+    private Uri photoUri;
+    private PhotoResult result;
+
+    //================================================================================
+    // Activity overrides
+    //================================================================================
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +66,7 @@ public class ResultActivity extends ProgressBarActivity implements ApiListener<P
 
         Intent intent = getIntent();
         photoUri = Uri.parse(intent.getStringExtra(PHOTO_URI_KEY));
+
         sendPhoto();
     }
 
@@ -73,23 +80,22 @@ public class ResultActivity extends ProgressBarActivity implements ApiListener<P
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.itemShare:
-                sharePhoto();
+                Intent shareIntent = new Intent();
+                shareIntent.setAction(Intent.ACTION_SEND);
+                shareIntent.putExtra(Intent.EXTRA_STREAM, photoUri);
+                shareIntent.setType("image/png");
+                startActivity(Intent.createChooser(shareIntent, getString(R.string.share_image_title)));
+                break;
+            default:
+                Log.e(TAG, "Unknown options menu item selected");
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    @OnClick(R.id.buttonSavePicture)
-    public void onClickButtonSavePicture(View view){
-        savePictureToGallery();
-    }
-
-    @OnClick(R.id.buttonSendFeedback)
-    public void onButtonSendFeedbackClick(View view){
-        Intent intent = new Intent(this, FeedbackActivity.class);
-        intent.putExtra(PhotoResult.PHOTO_RESULT_DATA_KEY, result);
-        startActivity(intent);
-    }
+    //================================================================================
+    // ApiListener overrides
+    //================================================================================
 
     @Override
     public void onSuccess(PhotoResult result) {
@@ -97,7 +103,7 @@ public class ResultActivity extends ProgressBarActivity implements ApiListener<P
         toggleProgressBar(progressBar);
         try {
             Bitmap bitmap = new Bitmap(MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoUri));
-            bitmap.convertToMutable(File.createTempFile("DRAW", ".png", this.getCacheDir()));
+            bitmap.convertToMutable(File.createTempFile("draw", ".jpeg", this.getCacheDir()));
             bitmap = drawOnBitmap(bitmap);
             File lastPhotoFile = new File(getFilesDir(), MainActivity.LAST_PICTURE_NAME);
             bitmap.saveToFile(lastPhotoFile);
@@ -105,6 +111,7 @@ public class ResultActivity extends ProgressBarActivity implements ApiListener<P
             imageViewPicture.setImageBitmap(bitmap.getBitmap());
         }
         catch (IOException e) {
+            Log.e(TAG, "Failed to save mutable bitmap");
             e.printStackTrace();
         }
     }
@@ -112,41 +119,22 @@ public class ResultActivity extends ProgressBarActivity implements ApiListener<P
     @Override
     public void onFailure(Exception e) {
         toggleProgressBar(progressBar);
+        Log.e(TAG, "Failed to retrieve data from API");
         e.printStackTrace();
         Toast.makeText(this, R.string.toast_error, Toast.LENGTH_LONG).show();
         finish();
     }
 
-    private void sendPhoto(){
-        toggleProgressBar(progressBar);
-        try {
-            ApiPhoto.getInstance().send(photoUri, this);
-        }
-        catch (NetworkErrorException e) {
-            toggleProgressBar(progressBar);
-            Toast.makeText(this, R.string.toast_network_unavailable, Toast.LENGTH_LONG).show();
-            e.printStackTrace();
-        }
-        catch (IOException e) {
-            toggleProgressBar(progressBar);
-            Toast.makeText(this, R.string.toast_error, Toast.LENGTH_LONG).show();
-            e.printStackTrace();
-        }
-    }
+    //================================================================================
+    // OnClickEvents
+    //================================================================================
 
-    private void sharePhoto(){
-        Intent shareIntent = new Intent();
-        shareIntent.setAction(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_STREAM, photoUri);
-        shareIntent.setType("image/png");
-        startActivity(Intent.createChooser(shareIntent, getString(R.string.share_image_title)));
-    }
-
-    private void savePictureToGallery() {
+    @OnClick(R.id.buttonSavePicture)
+    public void onClickButtonSavePicture(View view){
         try {
             File file = new File(Environment.getExternalStoragePublicDirectory(
                     this.getString(R.string.shared_directory_name)),
-                    new SimpleDateFormat("yyyyMMddHHmmss'.png'", Locale.getDefault()).format(new Date())
+                    new SimpleDateFormat("yyyyMMddHHmmss'.jpeg'", Locale.getDefault()).format(new Date())
             );
             FileUtils.forceMkdirParent(file);
             Bitmap bitmap = new Bitmap(MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoUri));
@@ -158,25 +146,64 @@ public class ResultActivity extends ProgressBarActivity implements ApiListener<P
             Toast.makeText(this, R.string.toast_save_photo_to_gallery_success, Toast.LENGTH_LONG).show();
         }
         catch (IOException e) {
+            Log.e(TAG, "Failed to save picture to gallery");
             e.printStackTrace();
             Toast.makeText(this, R.string.toast_save_photo_to_gallery_error, Toast.LENGTH_LONG).show();
         }
     }
 
+    @OnClick(R.id.buttonSendFeedback)
+    public void onButtonSendFeedbackClick(View view){
+        Intent intent = new Intent(this, FeedbackActivity.class);
+        intent.putExtra(PhotoResult.PHOTO_RESULT_DATA_KEY, result);
+        startActivity(intent);
+    }
+
+    //================================================================================
+    // Methods
+    //================================================================================
+
+    //Sends the photo using the ApiPhoto class
+    private void sendPhoto(){
+        toggleProgressBar(progressBar);
+        try {
+            ApiPhoto.getInstance().send(photoUri, this);
+        }
+        catch (NetworkErrorException e) {
+            toggleProgressBar(progressBar);
+            Toast.makeText(this, R.string.toast_network_unavailable, Toast.LENGTH_LONG).show();
+            Log.e(TAG, "Could not send photo to API, not network");
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+            toggleProgressBar(progressBar);
+            Toast.makeText(this, R.string.toast_error, Toast.LENGTH_LONG).show();
+            Log.e(TAG, "Failed to save image file to send to API");
+            e.printStackTrace();
+        }
+    }
+
+    //Draws the result on a bitmap
     private Bitmap drawOnBitmap(Bitmap bitmap) {
         int h = bitmap.getBitmap().getHeight();
         int w = bitmap.getBitmap().getWidth();
 
-        Canvas canvas = new Canvas(bitmap.getBitmap());
-        Paint paint = new Paint();
+        //Get a translated emotion if available
+        String emotion = getEmotionStringResource(result.getEmotion());
 
+        Canvas canvas = new Canvas(bitmap.getBitmap());
+
+        Paint paint = new Paint();
         canvas.drawBitmap(bitmap.getBitmap(), 0, 0, paint);
 
         //Draw result text
         paint.setColor(Color.WHITE);
-        paint.setTextSize(75);
-        canvas.drawText(result.getEmotion(), 25, 75, paint);
-        canvas.drawText(String.format(Locale.getDefault(),"%d %s",result.getAge(), getString(R.string.result_image_age_suffix)), 25, 175, paint);
+        paint.setTextSize(85);
+        canvas.drawText(emotion, 25, 75, paint);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(2);
+        paint.setColor(Color.BLACK);
+        canvas.drawText(emotion, 25, 75, paint);
 
         //Draw bottom bar
         Rect r = new Rect(0, h - 50, w, h);
@@ -190,6 +217,16 @@ public class ResultActivity extends ProgressBarActivity implements ApiListener<P
         canvas.drawText(getString(R.string.result_image_bottom_bar_text), w - (w - 10), h - 15, paint);
 
         return bitmap;
+    }
+
+    private String getEmotionStringResource(String emotion){
+        int resId = Application.getStringIdentifier(this, emotion);
+        if(resId == 0){
+            return emotion;
+        }
+        else{
+            return getString(resId);
+        }
     }
 }
 

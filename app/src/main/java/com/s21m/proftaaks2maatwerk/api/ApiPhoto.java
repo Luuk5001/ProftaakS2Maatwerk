@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 
-import com.s21m.proftaaks2maatwerk.R;
 import com.s21m.proftaaks2maatwerk.data.PhotoResult;
 import com.s21m.proftaaks2maatwerk.extensions.Application;
 import com.s21m.proftaaks2maatwerk.extensions.Bitmap;
@@ -31,10 +30,9 @@ import okhttp3.ResponseBody;
 public final class ApiPhoto {
 
     private static ApiPhoto apiPhotoInstance;
-    private static final String TAG = ApiPhoto.class.getSimpleName();
     private static final int FILE_RESOLUTION = 64;
-    private static final String POST_KEY = "photo";
-    private static final String POST_FILENAME = "photo.png";
+    private static final String POST_KEY = "upload";
+    private static final String POST_FILENAME = "photo.jpeg";
 
     private ApiPhoto(){
         if(apiPhotoInstance != null){
@@ -48,16 +46,19 @@ public final class ApiPhoto {
 
     public<T extends Context & ApiListener<PhotoResult>> void send(Uri imageUri, T context) throws NetworkErrorException, IOException {
         if (((Application)context.getApplicationContext()).isNetworkAvailable()) {
+
+            String apiUrl = "http://lucurlings.pythonanywhere.com/upload";
+
             File imageFile = getFileToSend(imageUri, context);
 
             final RequestBody body = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
                     .addFormDataPart(POST_KEY, POST_FILENAME,
-                            RequestBody.create(MediaType.parse("image/png"), imageFile))
+                            RequestBody.create(MediaType.parse("image/jpeg"), imageFile))
                     .build();
 
             final Request request = new Request.Builder()
-                    .url(context.getString(R.string.api_url))
+                    .url(apiUrl)
                     .post(body)
                     .build();
 
@@ -73,7 +74,7 @@ public final class ApiPhoto {
     private File getFileToSend(Uri imageUri, Context context) throws IOException {
         Bitmap bitmap = new Bitmap(MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri));
         bitmap.resize(FILE_RESOLUTION);
-        File imageFile = File.createTempFile("toSend", ".png", context.getCacheDir());
+        File imageFile = File.createTempFile("toSend", ".jpeg", context.getCacheDir());
         bitmap.saveToFile(imageFile);
         return  imageFile;
     }
